@@ -1,5 +1,5 @@
 # python 3.9
-# conda env create --name env_name python=3.9
+# conda create --name env_name python=3.9
 
 #   Name                    Version                   Build  Channel
 # _libgcc_mutex             0.1                        main
