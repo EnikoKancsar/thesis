@@ -1,6 +1,5 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import rand
+from torch import nn
 from model.modules.wasp import build_wasp
 from model.modules.decoder import build_decoder
 from model.modules.backbone import build_backbone
@@ -66,7 +65,7 @@ class Unipose(nn.Module):
 if __name__ == "__main__":
     model = waspnet(backbone='resnet', output_stride=16)
     model.eval()
-    input = torch.rand(1, 3, 513, 513)
+    input = rand(1, 3, 513, 513)
     output = model(input)
     print(output.size())
 
