@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn.functional import interpolate
 from model.modules.wasp import build_wasp
 from model.modules.decoder import build_decoder
-from model.modules.backbone import build_backbone
+from model.backbone import build_backbone
 
 class Unipose(nn.Module):
     def __init__(self, dataset, backbone='resnet', output_stride=16,

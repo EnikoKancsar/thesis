@@ -15,7 +15,7 @@ from utils.utils import draw_paint
 from utils       import evaluate
 from utils.utils import get_kpts
 
-from unipose import Unipose
+from model.unipose import Unipose
 
 from tqdm import tqdm  # Progress Bar Creator
 
