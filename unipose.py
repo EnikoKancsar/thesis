@@ -1,37 +1,26 @@
 # -*-coding:UTF-8-*-
 import argparse
-import time
 import torch.optim
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import sys
 import numpy as np
 import cv2
-import math
 sys.path.append("..")
 from utils.utils import get_model_summary
-from utils.utils import adjust_learning_rate as adjust_learning_rate
-from utils.utils import save_checkpoint      as save_checkpoint
-from utils.utils import printAccuracies      as printAccuracies
-from utils.utils import guassian_kernel      as guassian_kernel
-from utils.utils import get_parameters       as get_parameters
-from utils       import Mytransforms         as  Mytransforms 
-from utils.utils import getDataloader        as getDataloader
-from utils.utils import getOutImages         as getOutImages
-from utils.utils import AverageMeter         as AverageMeter
-from utils.utils import draw_paint           as draw_paint
-from utils       import evaluate             as evaluate
-from utils.utils import get_kpts             as get_kpts
+from utils.utils import adjust_learning_rate
+from utils.utils import save_checkpoint
+from utils.utils import printAccuracies
+from utils.utils import getDataloader
+from utils.utils import draw_paint
+from utils       import evaluate
+from utils.utils import get_kpts
 
 from model.unipose import unipose
 
 from tqdm import tqdm
 
-import torch.nn.functional as F
-from collections import OrderedDict
-from torchsummary import summary
-
-from PIL import Image
+from torch.nn.functional import interpolate
 
 
 class Trainer(object):
@@ -93,9 +82,9 @@ class Trainer(object):
         self.bestPCK  = 0
         self.bestPCKh = 0
 
-    # Print model summary and metrics
-    dump_input = torch.rand((1, 3, 368, 368]))
-    print(get_model_summary(self.modelmodel, dump_input))
+        # Print model summary and metrics
+        dump_input = torch.rand([1, 3, 368, 368])
+        print(get_model_summary(self.model, dump_input))
 
     def training(self, epoch):
         train_loss = 0.0
@@ -128,7 +117,7 @@ class Trainer(object):
             self.iters += 1
 
             if i == 10000:
-            	break
+                break
 
     def validation(self, epoch):
         self.model.eval()
@@ -220,7 +209,7 @@ class Trainer(object):
 
             heat = self.model(input_var)
 
-            heat = F.interpolate(heat, size=input_var.size()[2:], mode='bilinear', align_corners=True)
+            heat = interpolate(heat, size=input_var.size()[2:], mode='bilinear', align_corners=True)
 
             kpts = get_kpts(heat, img_h=368.0, img_w=368.0)
             draw_paint(img_path, kpts, idx, epoch, self.model_arch, self.dataset)
