@@ -4,6 +4,15 @@ Utilised:
 
 # Command line usage
 
+## Install dependencies
+
+```
+$ pip install -r requirements.txt
+```
+
+`-r, --requirement <file>`:
+Install from the given requirements file. This option can be used multiple times.
+
 ## Arguments
 
 - pretrained
