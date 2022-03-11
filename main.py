@@ -15,7 +15,7 @@ from utils.utils import draw_paint
 from utils       import evaluate
 from utils.utils import get_kpts
 
-from model.unipose import unipose
+from unipose import Unipose
 
 from tqdm import tqdm  # Progress Bar Creator
 
@@ -50,9 +50,9 @@ class Trainer(object):
             self.dataset, self.train_dir, self.val_dir, self.sigma,
             self.stride, self.workers, self.batch_size)
 
-        model = unipose(
+        model = Unipose(
             self.dataset, num_classes=self.numClasses, backbone='resnet',
-            output_stride=16, sync_bn=True, freeze_bn=False, stride=self.stride)
+            output_stride=16, freeze_bn=False, stride=self.stride)
 
         self.model       = model.cuda()
 
