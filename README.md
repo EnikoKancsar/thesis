@@ -2,6 +2,36 @@ Utilised:
 - [bmartacho/UniPose](https://github.com/bmartacho/UniPose)
 - [RobertS312312/UniPose](https://github.com/RobertS312312/UniPose) (a fork of bmartacho/UniPose)
 
+# Command line usage
+
+## Arguments
+
+- pretrained
+    * If the model is pretrained, specify the path to the pretrained weights from where they can be loaded with torch.load()
+    * '/PATH/TO/WEIGHTS'
+    * default=None
+- dataset
+    * choices=['LSP', 'MPII'], default='LSP'
+- train_dir
+    * default='/PATH/TO/TRAIN'
+- val_dir
+    * default='/PATH/TO/LSP/VAL'
+- model_name (default=None)
+    * Only used as a filename to save the torch model.
+Added:
+- test
+    * bool, default=False
+    * If True, the model will do testing instead of training.
+    * Refactored from the original code commenting out way.
+Removed from the original:
+- model_arch (default='unipose')
+    * Never actually used, only passed on without utilizing.
+
+## Command
+
+```
+$ python main.py --model_name "unipose"
+```
 
 # FAQ
 

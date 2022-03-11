@@ -236,15 +236,21 @@ class Trainer(object):
                 cv2.imwrite('samples/heat/unipose'+str(i)+'.png', im_heat)
         
 parser = argparse.ArgumentParser()
-parser.add_argument('--pretrained', default=None,type=str, dest='pretrained')
-parser.add_argument('--dataset', type=str, dest='dataset', default='LSP')
-parser.add_argument('--train_dir', default='/PATH/TO/TRAIN',type=str, dest='train_dir')
-parser.add_argument('--val_dir', type=str, dest='val_dir', default='/PATH/TO/LSP/VAL')
-parser.add_argument('--model_name', default=None, type=str)
-parser.add_argument('--model_arch', default='unipose', type=str)
+parser.add_argument('--pretrained', default=None, type=str, help="""
+'/PATH/TO/WEIGHTS'
 
-starter_epoch =    0
-epochs        =  100
+If you wish to use pretrained weights, specify their path with this option
+to be loaded with torch.load().
+""")
+parser.add_argument('--dataset', default='LSP', choices=['LSP', 'MPII'], type=str, help='')
+parser.add_argument('--train_dir', default='/PATH/TO/TRAIN', type=str, help='')
+parser.add_argument('--val_dir', default='/PATH/TO/LSP/VAL', type=str, help='')
+parser.add_argument('--model_name', default=None, type=str, help="""
+Used as a filename to save the best performing model.
+""")
+parser.add_argument('--test', default=False, choices=[False, True], type=bool, help="""
+If True/1, the model will do testing instead of training.
+""")
 
 args = parser.parse_args()
 
@@ -257,9 +263,11 @@ elif args.dataset == 'MPII':
     args.val_dir    = '/PATH/TO/MPIII/VAL'
 
 trainer = Trainer(args)
-for epoch in range(starter_epoch, epochs):
-    trainer.training(epoch)
-    trainer.validation(epoch)
-	
-# Uncomment for inference, demo, and samples for the trained model:
-# trainer.test(0)
+
+if args.test:
+    trainer.test(0)
+else:
+    epochs = 100
+    for epoch in range(epochs):
+        trainer.training(epoch)
+        trainer.validation(epoch)
