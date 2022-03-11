@@ -46,7 +46,7 @@ class Decoder(nn.Module):
         x = cat((x, low_level_feat), dim=1)
         x = self.last_conv(x)
 
-        #x = self.maxpool(x)
+        # x = self.maxpool(x)
 
         return x
 
