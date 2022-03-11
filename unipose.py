@@ -9,7 +9,6 @@ import cv2
 sys.path.append("..")
 from utils.utils import get_model_summary
 from utils.utils import adjust_learning_rate
-from utils.utils import save_checkpoint
 from utils.utils import printAccuracies
 from utils.utils import getDataloader
 from utils.utils import draw_paint
@@ -171,8 +170,10 @@ class Trainer(object):
 
         if mAP > self.isBest:
             self.isBest = mAP
-            save_checkpoint({'state_dict': self.model.state_dict()}, self.isBest, self.args.model_name)
-            print("Model saved to "+self.args.model_name)
+            if self.isBest:
+                torch.save({'state_dict': self.model.state_dict()},
+                           self.args.model_name + '_best.pth.tar')
+            print("Model saved to " + self.args.model_name)
 
         if mPCKh > self.bestPCKh:
             self.bestPCKh = mPCKh
