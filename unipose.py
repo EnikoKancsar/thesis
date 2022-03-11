@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import sys
 import numpy as np
-import cv2
+import cv2  # image analysis
 sys.path.append("..")
 from utils.utils import get_model_summary
 from utils.utils import adjust_learning_rate
@@ -17,7 +17,7 @@ from utils.utils import get_kpts
 
 from model.unipose import unipose
 
-from tqdm import tqdm
+from tqdm import tqdm  # Progress Bar Creator
 
 from torch.nn.functional import interpolate
 
