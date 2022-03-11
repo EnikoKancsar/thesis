@@ -29,7 +29,6 @@ class Trainer(object):
         self.val_dir      = args.val_dir
         self.dataset      = args.dataset
 
-
         self.workers      = 1
         self.weight_decay = 0.0005
         self.momentum     = 0.9
@@ -47,10 +46,13 @@ class Trainer(object):
         elif self.dataset == "MPII":
             self.numClasses  = 16
 
-        self.train_loader, self.val_loader = getDataloader(self.dataset, self.train_dir,\
-            self.val_dir, self.sigma, self.stride, self.workers, self.batch_size)
+        self.train_loader, self.val_loader = getDataloader(
+            self.dataset, self.train_dir, self.val_dir, self.sigma,
+            self.stride, self.workers, self.batch_size)
 
-        model = unipose(self.dataset, num_classes=self.numClasses,backbone='resnet',output_stride=16,sync_bn=True,freeze_bn=False, stride=self.stride)
+        model = unipose(
+            self.dataset, num_classes=self.numClasses, backbone='resnet',
+            output_stride=16, sync_bn=True, freeze_bn=False, stride=self.stride)
 
         self.model       = model.cuda()
 
@@ -76,7 +78,7 @@ class Trainer(object):
             state_dict.update(model_dict)
             self.model.load_state_dict(state_dict)
             
-        self.isBest = 0
+        self.isBest   = 0
         self.bestPCK  = 0
         self.bestPCKh = 0
 
@@ -91,17 +93,18 @@ class Trainer(object):
         tbar = tqdm(self.train_loader)
 
         for i, (input, heatmap, centermap, img_path) in enumerate(tbar):
-            learning_rate = adjust_learning_rate(self.optimizer, self.iters, self.lr, policy='step',
-                                                 gamma=self.gamma, step_size=self.step_size)
+            learning_rate = adjust_learning_rate(
+                self.optimizer, self.iters, self.lr, policy='step',
+                gamma=self.gamma, step_size=self.step_size)
 
-            input_var     =     input.cuda()
-            heatmap_var   =    heatmap.cuda()
+            input_var = input.cuda()
+            heatmap_var = heatmap.cuda()
 
             self.optimizer.zero_grad()
 
             heat = self.model(input_var)
 
-            loss_heat   = self.criterion(heat,  heatmap_var)
+            loss_heat = self.criterion(heat, heatmap_var)
 
             loss = loss_heat
 
@@ -132,24 +135,27 @@ class Trainer(object):
 
             cnt += 1
 
-            input_var     =      input.cuda()
-            heatmap_var   =    heatmap.cuda()
+            input_var = input.cuda()
+            heatmap_var = heatmap.cuda()
             self.optimizer.zero_grad()
 
             heat = self.model(input_var)
-            loss_heat   = self.criterion(heat,  heatmap_var)
+            loss_heat = self.criterion(heat,  heatmap_var)
 
             loss = loss_heat
 
             val_loss += loss_heat.item()
 
-            tbar.set_description('Val   loss: %.6f' % (val_loss / ((i + 1)*self.batch_size)))
+            tbar.set_description('Val loss: %.6f' % (val_loss / ((i + 1)*self.batch_size)))
 
-            acc, acc_PCK, acc_PCKh, cnt, pred, visible = evaluate.accuracy(heat.detach().cpu().numpy(), heatmap_var.detach().cpu().numpy(),0.2,0.5, self.dataset)
+            acc, acc_PCK, acc_PCKh, cnt, pred, visible = evaluate.accuracy(
+                heat.detach().cpu().numpy(),
+                heatmap_var.detach().cpu().numpy(),
+                0.2, 0.5, self.dataset)
 
-            AP[0]     = (AP[0]  *i + acc[0])      / (i + 1)
-            PCK[0]    = (PCK[0] *i + acc_PCK[0])  / (i + 1)
-            PCKh[0]   = (PCKh[0]*i + acc_PCKh[0]) / (i + 1)
+            AP[0]   = (AP[0]  *i + acc[0])      / (i + 1)
+            PCK[0]  = (PCK[0] *i + acc_PCK[0])  / (i + 1)
+            PCKh[0] = (PCKh[0]*i + acc_PCKh[0]) / (i + 1)
 
             for j in range(1,self.numClasses+1):
                 if visible[j] == 1:
@@ -158,9 +164,9 @@ class Trainer(object):
                     PCKh[j]   = (PCKh[j]*count[j] + acc_PCKh[j]) / (count[j] + 1)
                     count[j] += 1
 
-            mAP     =   AP[1:].sum()/(self.numClasses)
-            mPCK    =  PCK[1:].sum()/(self.numClasses)
-            mPCKh   = PCKh[1:].sum()/(self.numClasses)
+            mAP   =   AP[1:].sum()/(self.numClasses)
+            mPCK  =  PCK[1:].sum()/(self.numClasses)
+            mPCKh = PCKh[1:].sum()/(self.numClasses)
 	
         printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, self.dataset)
             
@@ -179,11 +185,16 @@ class Trainer(object):
         if mPCK > self.bestPCK:
             self.bestPCK = mPCK
 
-        print("Best AP = %.2f%%; PCK = %2.2f%%; PCKh = %2.2f%%" % (self.isBest*100, self.bestPCK*100,self.bestPCKh*100))
+        print("Best AP = %.2f%%; PCK = %2.2f%%; PCKh = %2.2f%%"
+              % (self.isBest*100, self.bestPCK*100, self.bestPCKh*100))
+        # "%f": floating point type
+        # "%.2f": print only the first 2 decimals (rounded)
+        # "%.2f%": error
+        # "%.2f%%": write a % sign after the number
+        #           % is a special character, it has to be escaped
+        # "%2.2f%%": ??? typo???
 
-
-
-    def test(self,epoch):
+    def test(self, epoch):
         self.model.eval()
         print("Testing") 
 
@@ -193,7 +204,8 @@ class Trainer(object):
 
             center   = [184, 184]
 
-            img  = np.array(cv2.resize(cv2.imread(img_path),(368,368)), dtype=np.float32)
+            img  = np.array(cv2.resize(cv2.imread(img_path), (368,368)),
+            dtype=np.float32)
             img  = img.transpose(2, 0, 1)
             img  = torch.from_numpy(img)
             mean = [128.0, 128.0, 128.0]
@@ -201,39 +213,36 @@ class Trainer(object):
             for t, m, s in zip(img, mean, std):
                 t.sub_(m).div_(s)
 
-            img       = torch.unsqueeze(img, 0)
+            img = torch.unsqueeze(img, 0)
 
             self.model.eval()
 
-            input_var   = img.cuda()
+            input_var = img.cuda()
 
             heat = self.model(input_var)
-
             heat = interpolate(heat, size=input_var.size()[2:], mode='bilinear', align_corners=True)
 
             kpts = get_kpts(heat, img_h=368.0, img_w=368.0)
             draw_paint(img_path, kpts, idx, epoch, self.dataset)
 
             heat = heat.detach().cpu().numpy()
-
             heat = heat[0].transpose(1,2,0)
-
 
             for i in range(heat.shape[0]):
                 for j in range(heat.shape[1]):
                     for k in range(heat.shape[2]):
                         if heat[i,j,k] < 0:
                             heat[i,j,k] = 0
-                        
 
-            im       = cv2.resize(cv2.imread(img_path),(368,368))
+            im = cv2.resize(cv2.imread(img_path), (368,368))
 
             heatmap = []
             for i in range(self.numClasses+1):
                 heatmap = cv2.applyColorMap(np.uint8(255*heat[:,:,i]), cv2.COLORMAP_JET)
-                im_heat  = cv2.addWeighted(im, 0.6, heatmap, 0.4, 0)
+                im_heat = cv2.addWeighted(im, 0.6, heatmap, 0.4, 0)
                 cv2.imwrite('samples/heat/unipose'+str(i)+'.png', im_heat)
-        
+
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--pretrained', default=None, type=str, help="""
 '/PATH/TO/WEIGHTS'
