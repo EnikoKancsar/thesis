@@ -1,5 +1,6 @@
 # -*-coding:UTF-8-*-
 import argparse
+import torch
 import torch.optim
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
@@ -158,9 +159,9 @@ class Trainer(object):
 
             for j in range(1,self.numClasses+1):
                 if visible[j] == 1:
-                    AP[j]     = (AP[j]  *count[j] + acc[j])      / (count[j] + 1)
-                    PCK[j]    = (PCK[j] *count[j] + acc_PCK[j])  / (count[j] + 1)
-                    PCKh[j]   = (PCKh[j]*count[j] + acc_PCKh[j]) / (count[j] + 1)
+                    AP[j]   = (AP[j]  *count[j] + acc[j])      / (count[j] + 1)
+                    PCK[j]  = (PCK[j] *count[j] + acc_PCK[j])  / (count[j] + 1)
+                    PCKh[j] = (PCKh[j]*count[j] + acc_PCKh[j]) / (count[j] + 1)
                     count[j] += 1
 
             mAP   =   AP[1:].sum()/(self.numClasses)
