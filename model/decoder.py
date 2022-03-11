@@ -41,7 +41,8 @@ class Decoder(nn.Module):
 
         low_level_feat = self.maxpool(low_level_feat)
 
-        x = interpolate(x, size=low_level_feat.size()[2:], mode='bilinear', align_corners=True)
+        x = interpolate(x, size=low_level_feat.size()[2:], mode='bilinear',
+                        align_corners=True)
 
         x = cat((x, low_level_feat), dim=1)
         x = self.last_conv(x)

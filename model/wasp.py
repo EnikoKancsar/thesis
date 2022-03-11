@@ -85,7 +85,8 @@ class WASP(nn.Module):
         x4 = self.conv2(x4)
 
         x5 = self.global_avg_pool(x)
-        x5 = interpolate(x5, size=x4.size()[2:], mode='bilinear', align_corners=True)
+        x5 = interpolate(x5, size=x4.size()[2:], mode='bilinear',
+                         align_corners=True)
         x = cat((x1, x2, x3, x4, x5), dim=1)
 
         x = self.conv1(x)
