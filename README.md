@@ -75,3 +75,7 @@ If the conda environment is not set already, the activate command should work co
 
 This parameter is actually not used within `Unipose()`.
 Except one place in the `Decoder()` where it checks if it's NTID which I don't plan to use.
+
+## Removing `if __name__ == “main”:`
+
+`if __name__ == “main”:` is used to execute some code only if the file was run directly, and not imported. ([Source](https://www.geeksforgeeks.org/what-does-the-if-__name__-__main__-do/))
