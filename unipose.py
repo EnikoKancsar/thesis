@@ -20,6 +20,8 @@ class Unipose(nn.Module):
         self.decoder = build_decoder(dataset, num_classes, backbone, BatchNorm)
 
         if freeze_bn:
+            # If you're fine-tuning to minimize training,
+            # it's typically best to keep batch normalization frozen
             self.freeze_bn()
 
     def forward(self, input):
@@ -30,17 +32,17 @@ class Unipose(nn.Module):
             x = interpolate(x, size=(input.size()[2:]), mode='bilinear', align_corners=True)
 
         # If you are extracting bounding boxes as well
-#         return x[:,0:self.num_classes+1,:,:], x[:,self.num_classes+1:,:,:] 
+        # return x[:,0:self.num_classes+1,:,:], x[:,self.num_classes+1:,:,:]
     
         # If you are only extracting keypoints
         return x
 
     def freeze_bn(self):
         for m in self.modules():
-            if isinstance(m, SynchronizedBatchNorm2d):
+            if isinstance(m, nn.BatchNorm2d):
                 m.eval()
-            elif isinstance(m, nn.BatchNorm2d):
-                m.eval()
+            # elif isinstance(m, SynchronizedBatchNorm2d):
+            #     m.eval()
 
     def get_1x_lr_params(self):
         modules = [self.backbone]

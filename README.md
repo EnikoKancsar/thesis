@@ -62,3 +62,9 @@ If the conda environment is not set already, the activate command should work co
 > But if your input sizes changes at each iteration, then `cudnn will benchmark every time a new size appears, possibly leading to worse runtime performances.
 
 [fmassa's answer](https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936/2)
+
+## `freeze_bn=False`
+
+[Why should you freeze BN layers while fine-tuning](https://stackoverflow.com/questions/63016740/why-its-necessary-to-frozen-all-inner-state-of-a-batch-normalization-layer-when)
+
+[How to freeze BN layers while training](https://discuss.pytorch.org/t/how-to-freeze-bn-layers-while-training-the-rest-of-network-mean-and-var-wont-freeze/89736/11)
