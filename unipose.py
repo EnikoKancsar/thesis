@@ -15,9 +15,9 @@ class Unipose(nn.Module):
         BatchNorm = nn.BatchNorm2d
         self.pool_center = nn.AvgPool2d(kernel_size=9, stride=8, padding=1)
 
-        self.backbone    = build_backbone(backbone, output_stride, BatchNorm)
-        self.wasp        = build_wasp(backbone, output_stride, BatchNorm)
-        self.decoder     = build_decoder(dataset, num_classes, backbone, BatchNorm)
+        self.backbone = build_backbone(backbone, output_stride, BatchNorm)
+        self.wasp = build_wasp(backbone, output_stride, BatchNorm)
+        self.decoder = build_decoder(dataset, num_classes, backbone, BatchNorm)
 
         if freeze_bn:
             self.freeze_bn()
@@ -29,7 +29,7 @@ class Unipose(nn.Module):
         if self.stride != 8:
             x = interpolate(x, size=(input.size()[2:]), mode='bilinear', align_corners=True)
 
-        # If you are extracting bouding boxes as well
+        # If you are extracting bounding boxes as well
 #         return x[:,0:self.num_classes+1,:,:], x[:,self.num_classes+1:,:,:] 
     
         # If you are only extracting keypoints
