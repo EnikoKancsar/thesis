@@ -1,5 +1,6 @@
 from torch import rand
 from torch import nn
+from torch.nn.functional import interpolate
 from model.modules.wasp import build_wasp
 from model.modules.decoder import build_decoder
 from model.modules.backbone import build_backbone
@@ -26,7 +27,7 @@ class Unipose(nn.Module):
         x = self.wasp(x)
         x = self.decoder(x, low_level_feat)
         if self.stride != 8:
-            x = F.interpolate(x, size=(input.size()[2:]), mode='bilinear', align_corners=True)
+            x = interpolate(x, size=(input.size()[2:]), mode='bilinear', align_corners=True)
 
         # If you are extracting bouding boxes as well
 #         return x[:,0:self.num_classes+1,:,:], x[:,self.num_classes+1:,:,:] 
