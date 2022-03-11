@@ -10,7 +10,7 @@ sys.path.append("..")
 from utils.utils import get_model_summary
 from utils.utils import adjust_learning_rate
 from utils.utils import printAccuracies
-from utils.utils import getDataloader
+from utils import getDataloader
 from utils.utils import draw_paint
 from utils       import evaluate
 from utils.utils import get_kpts
