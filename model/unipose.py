@@ -1,9 +1,9 @@
 from torch import rand
 from torch import nn
 from torch.nn.functional import interpolate
-from model.modules.wasp import build_wasp
-from model.modules.decoder import build_decoder
-from model.backbone import build_backbone
+from model.wasp import WASP
+from model.decoder import Decoder
+from model.resnet import ResNet101
 
 class Unipose(nn.Module):
     def __init__(self, dataset, backbone='resnet', output_stride=16,
@@ -15,10 +15,9 @@ class Unipose(nn.Module):
         BatchNorm = nn.BatchNorm2d
         self.pool_center = nn.AvgPool2d(kernel_size=9, stride=8, padding=1)
 
-        self.backbone = build_backbone(backbone, output_stride, BatchNorm)
-        self.wasp = build_wasp(backbone, output_stride, BatchNorm)
-        self.decoder = build_decoder(dataset, num_classes, backbone, BatchNorm)
-
+        self.backbone = ResNet101(output_stride, BatchNorm)
+        self.wasp = WASP(output_stride, BatchNorm)
+        self.decoder = Decoder(num_classes, BatchNorm)
         if freeze_bn:
             # If you're fine-tuning to minimize training,
             # it's typically best to keep batch normalization frozen
