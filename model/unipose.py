@@ -6,8 +6,8 @@ from model.decoder import Decoder
 from model.resnet import ResNet101
 
 class Unipose(nn.Module):
-    def __init__(self, dataset, backbone='resnet', output_stride=16,
-                 num_classes=21, freeze_bn=False, stride=8):
+    def __init__(self, output_stride=16, num_classes=21, freeze_bn=False,
+                 stride=8):
         super(Unipose, self).__init__()
         self.stride = stride
         self.num_classes = num_classes

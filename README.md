@@ -68,3 +68,10 @@ If the conda environment is not set already, the activate command should work co
 [Why should you freeze BN layers while fine-tuning](https://stackoverflow.com/questions/63016740/why-its-necessary-to-frozen-all-inner-state-of-a-batch-normalization-layer-when)
 
 [How to freeze BN layers while training](https://discuss.pytorch.org/t/how-to-freeze-bn-layers-while-training-the-rest-of-network-mean-and-var-wont-freeze/89736/11)
+
+# Notes
+
+## Removing `dataset`
+
+This parameter is actually not used within `Unipose()`.
+Except one place in the `Decoder()` where it checks if it's NTID which I don't plan to use.
