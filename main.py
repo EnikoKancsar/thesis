@@ -50,9 +50,8 @@ class Trainer(object):
             self.dataset, self.train_dir, self.val_dir, self.sigma,
             self.stride, self.workers, self.batch_size)
 
-        model = Unipose(
-            self.dataset, num_classes=self.numClasses, backbone='resnet',
-            output_stride=16, freeze_bn=False, stride=self.stride)
+        model = Unipose(num_classes=self.numClasses, output_stride=16,
+                        freeze_bn=False, stride=self.stride)
 
         self.model       = model.cuda()
 
