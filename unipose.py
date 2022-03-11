@@ -39,7 +39,7 @@ class Trainer(object):
         self.sigma        = 3
         self.stride       = 8
 
-        cudnn.benchmark   = True
+        cudnn.benchmark   = True  # good when input sizes do not vary
 
         if self.dataset   ==  "LSP":
             self.numClasses  = 14

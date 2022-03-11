@@ -52,3 +52,13 @@ Activate the desired conda environment there.
 Type `$ code` which will open VSC in the current folder.
 Open the Terminal in VSC.
 If the conda environment is not set already, the activate command should work correctly now after being started from the command line.
+
+## `cudnn=True`
+
+> It enables benchmark mode in cudnn.
+>
+> Benchmark mode is good whenever your input sizes for your network do not vary. This way, `cudnn` will look for the optimal set of algorithms for that particular configuration (which takes some time). This usually leads to faster runtime.
+>
+> But if your input sizes changes at each iteration, then `cudnn will benchmark every time a new size appears, possibly leading to worse runtime performances.
+
+[fmassa's answer](https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936/2)
