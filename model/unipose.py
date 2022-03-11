@@ -1,4 +1,3 @@
-from torch import rand
 from torch import nn
 from torch.nn.functional import interpolate
 from model.wasp import WASP
