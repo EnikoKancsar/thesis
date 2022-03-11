@@ -27,7 +27,6 @@ class Trainer(object):
         self.args         = args
         self.train_dir    = args.train_dir
         self.val_dir      = args.val_dir
-        self.model_arch   = args.model_arch
         self.dataset      = args.dataset
 
 
@@ -213,7 +212,7 @@ class Trainer(object):
             heat = interpolate(heat, size=input_var.size()[2:], mode='bilinear', align_corners=True)
 
             kpts = get_kpts(heat, img_h=368.0, img_w=368.0)
-            draw_paint(img_path, kpts, idx, epoch, self.model_arch, self.dataset)
+            draw_paint(img_path, kpts, idx, epoch, self.dataset)
 
             heat = heat.detach().cpu().numpy()
 
