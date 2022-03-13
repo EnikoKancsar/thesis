@@ -8,7 +8,7 @@ import sys
 import numpy as np
 import cv2  # image analysis
 sys.path.append("..")
-from utils.utils import get_model_summary
+from utils import get_model_summary
 from utils.utils import adjust_learning_rate
 from utils.utils import printAccuracies
 from utils import getDataloader
