@@ -55,7 +55,7 @@ def crop(img, points, center, scale, resolution):
 
 
 class MPII(data.Dataset):
-    def __init__(self, root_dir, sigma, is_train
+    def __init__(self, root_dir, sigma, is_train, stride=8
                 # ,transform=None
                 ):
         self.width       = 368
@@ -64,7 +64,7 @@ class MPII(data.Dataset):
         self.is_train    = is_train
         self.sigma       = sigma
         self.parts_num   = 16
-        self.stride      = 8
+        self.stride      = stride
 
         self.labels_dir  = root_dir
         self.images_dir  = root_dir + 'images/'

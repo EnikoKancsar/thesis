@@ -142,7 +142,7 @@ def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
                   workers, batch_size):
     if dataset == 'MPII':
         train_loader = DataLoader(
-            MPII(train_dir, sigma, "Train",
+            MPII(train_dir, sigma, "Train", stride
                 #  transforms.Compose([transforms.TestResized(368),])
                  ),
             batch_size=batch_size, shuffle=True, num_workers=workers,
