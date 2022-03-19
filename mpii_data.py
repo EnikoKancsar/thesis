@@ -1,14 +1,14 @@
 # -*-coding:UTF-8-*-
 from __future__ import print_function, absolute_import
-
-import transforms
 import numpy as np
 import json
 import cv2
 import os
-
 import torch
 import torch.utils.data as data
+
+import transforms
+from utils import gaussian_kernel
 
 
 def get_transform(center, scale, resolution):
@@ -52,23 +52,6 @@ def crop(img, points, center, scale, resolution):
     center[1] -= max(0, upperLeft[1])
 
     return new_img, upperLeft, bottomRight, points, center
-
-
-def gaussian_kernel(size_w, size_h, center_x, center_y, sigma):
-    """Gaussian Kernel (or Radial Basic Function (RBF) kernel)
-    It is most widely used.
-    Each kernel entry is a dissimilarity measure through using the square of
-    Euclidean distance between two data points in a negative exponential.
-    The sigma parameter contained in the entry is the Parzen window width for
-    RBF kernel.
-
-    source: Han 2011, Sigma Tuning of Gaussian Kernels
-    https://www.cs.rpi.edu/~szymansk/papers/han.10.pdf
-
-    """
-    gridy, gridx = np.mgrid[0:size_h, 0:size_w]
-    D2 = (gridx - center_x) ** 2 + (gridy - center_y) ** 2
-    return np.exp(-D2 / 2.0 / sigma / sigma)
 
 
 class MPII(data.Dataset):
