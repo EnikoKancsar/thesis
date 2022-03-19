@@ -8,12 +8,12 @@ import sys
 import numpy as np
 import cv2  # image analysis
 sys.path.append("..")
-from utils import get_model_summary
+from unipose.utils import get_model_summary
 from utils.utils import adjust_learning_rate
 from utils.utils import printAccuracies
-from utils import getDataloader
+from unipose.utils import getDataloader
 from utils.utils import draw_paint
-from utils       import evaluate
+from unipose.utils       import evaluate
 from utils.utils import get_kpts
 
 from model.unipose import Unipose

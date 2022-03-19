@@ -7,8 +7,8 @@ import os
 import torch
 import torch.utils.data as data
 
-import transforms
-from utils import gaussian_kernel
+import unipose.transforms as transforms
+from unipose.utils import gaussian_kernel
 
 
 def get_transform(center, scale, resolution):

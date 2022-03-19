@@ -5,7 +5,7 @@ from torch import nn
 from torch import prod
 import os
 
-from mpii_data import MPII
+from unipose.mpii_data import MPII
 from torch.utils.data import DataLoader
 # import transforms
 
