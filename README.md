@@ -2,6 +2,25 @@ Utilised:
 - [bmartacho/UniPose](https://github.com/bmartacho/UniPose)
 - [RobertS312312/UniPose](https://github.com/RobertS312312/UniPose) (a fork of bmartacho/UniPose)
 
+# Configuration
+
+The `conf_sample.py` file contains config data, like paths that are relative to local.
+
+Either rename it to `conf.py` or copy it.
+```
+cp conf_sample.py conf.py
+```
+Then fill it in with your local data.
+
+## Prepare Data
+
+### MPII
+
+The [MPII Dataset](http://human-pose.mpi-inf.mpg.de/) presents its annotations in `.mat` format. To process it in Python convert it to `.json` with this script after specifying the path in `conf.py`.
+```
+python mpii_mat_to_json.py
+```
+
 # Command line usage
 
 ## Install dependencies
