@@ -141,6 +141,21 @@ def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
 
 def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
                   workers, batch_size):
+    """ torch.utils.data.Dataloader
+    
+    :param dataset: 
+    :param batch_size (int, optional, default=1)
+        how many samples per batch to load
+    :param shuffle: (bool, optional, default=False)
+        True: have the data reshuffled at every epoch
+    :param num_workers: (int, optional, default=0)
+        how many subprocesses to use for data loading.
+        0: the data will be loaded in the main process
+    :param pin_memory: (bool, optional, default=False)
+        True: the data loader will copy Tensors into CUDA pinned memory
+              before returning them
+    """
+
     if dataset == 'MPII':
         train_loader = DataLoader(
             MPII(train_dir, sigma, "Train", stride
@@ -162,9 +177,3 @@ def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
     return train_loader, val_loader, test_loader
-    """
-    DataLoader(
-        dataset,
-        batch_size=1, shuffle=False, num_workers=0,
-        pin_memory=False)
-    """
