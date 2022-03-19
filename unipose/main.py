@@ -11,8 +11,6 @@ from torch.nn.functional import interpolate
 import torch.optim
 from tqdm import tqdm  # Progress Bar Creator
 
-sys.path.append("..")
-
 from unipose.model.unipose import Unipose
 from unipose.utils import get_model_summary
 from unipose.utils import getDataloader
