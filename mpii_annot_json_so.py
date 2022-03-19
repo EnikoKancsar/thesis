@@ -1,10 +1,9 @@
 # Source: https://stackoverflow.com/a/61074404/13497164
 
 import json
-import os
-
 from numpy import ndarray
-from numpy import uint16, uint8, int16
+# from numpy import uint16, uint8, int16
+import os
 from scipy import io
 
 from conf import MPII_ANNOTATIONS_PATH

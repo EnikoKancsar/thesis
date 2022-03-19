@@ -16,10 +16,86 @@ Then fill it in with your local data.
 
 ### MPII
 
-The [MPII Dataset](http://human-pose.mpi-inf.mpg.de/) presents its annotations in `.mat` format. To process it in Python convert it to `.json` with this script after specifying the path in `conf.py`.
+The Max Planck Insitut Informatik Dataset can be downloaded from [here](http://human-pose.mpi-inf.mpg.de/#download)
+
+The annotations have a `.mat` extension which has to be converted to `.json` for UniPose.
+
+Neither of the following conversions is a correct version for the UniPose code, so the UniPose code will be refactored to use one of these annotations structures.
+
+#### Qi Zhang@StackOverflow Version
+
+After specifying the path in your `conf.py`, run this script.
 ```
-python mpii_mat_to_json.py
+python mpii_annot_json_so.py
 ```
+
+##### Annotation structure
+
+.annolist(imgidx) - annotations for image imgidx
+
+.image.name - image filename
+.annorect(ridx) - body annotations for a person ridx
+.x1, .y1, .x2, .y2 - coordinates of the head rectangle
+.scale - person scale w.r.t. 200 px height
+.objpos - rough human position in the image
+.annopoints.point - person-centric body joint annotations
+.x, .y - coordinates of a joint
+id - joint id (0 - r ankle, 1 - r knee, 2 - r hip, 3 - l hip, 4 - l knee, 5 - l ankle, 6 - pelvis, 7 - thorax, 8 - upper neck, 9 - head top, 10 - r wrist, 11 - r elbow, 12 - r shoulder, 13 - l shoulder, 14 - l elbow, 15 - l wrist)
+is_visible - joint visibility
+.vidx - video index in video_list
+.frame_sec - image position in video, in seconds
+img_train(imgidx) - training/testing image assignment
+
+single_person(imgidx) - contains rectangle id ridx of sufficiently separated individuals
+
+act(imgidx) - activity/category label for image imgidx
+
+act_name - activity name
+cat_name - category name
+act_id - activity id
+video_list(videoidx) 
+
+#### Deep High Resolution Net Version
+
+Download their `.json` files from here: [Deep High Resolution Net Data Preparation for MPII Data](https://github.com/leoxiaobin/deep-high-resolution-net.pytorch).
+
+The files can be loaded as Python dictionaries with `json.load()` as in `mpii_annot_json_dhrn.py`.
+
+##### Annotation structure
+```
+{
+    'center': [594.0, 257.0],
+    'image': '015601864.jpg',
+    'joints': [
+        [620.0, 394.0],
+        [616.0, 269.0],
+        [573.0, 185.0],
+        [647.0, 188.0],
+        [661.0, 221.0],
+        [656.0, 231.0],
+        [610.0, 187.0],
+        [647.0, 176.0],
+        [637.0201, 189.8183],
+        [695.9799, 108.1817],
+        [606.0, 217.0],
+        [553.0, 161.0],
+        [601.0, 167.0],
+        [692.0, 185.0],
+        [693.0, 240.0],
+        [688.0, 313.0]
+    ],
+    'joints_vis': [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    'scale': 3.021046
+}
+```
+
+##### Joint ID
+
+* 0 - r ankle, 1 - r knee, 2 - r hip,
+* 3 - l hip, 4 - l knee, 5 - l ankle,
+* 6 - pelvis, 7 - thorax, 8 - upper neck, 9 - head top,
+* 10 - r wrist, 11 - r elbow, 12 - r shoulder,
+* 13 - l shoulder, 14 - l elbow, 15 - l wrist
 
 # Command line usage
 
