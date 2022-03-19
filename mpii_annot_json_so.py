@@ -3,12 +3,13 @@
 import json
 from numpy import ndarray
 # from numpy import uint16, uint8, int16
-import os
 from scipy import io
 
-from conf import MPII_ANNOTATIONS_PATH
+from conf import MPII_ANNOTATIONS_MAT_PATH
+from conf import MPII_ANNOTATIONS_JSON_NAME
 
-MPII_MAT = io.loadmat(MPII_ANNOTATIONS_PATH, struct_as_record=False)["RELEASE"]
+
+MPII_MAT = io.loadmat(MPII_ANNOTATIONS_MAT_PATH, struct_as_record=False)["RELEASE"]
 
 MUST_BE_LIST = ["annolist", "annorect", "point", "img_train", "single_person",
                 "act", "video_list"]
@@ -46,10 +47,7 @@ def generate_dataset_obj(obj):
 MPII_DICT = generate_dataset_obj(MPII_MAT)
 MPII_STR = json.dumps(MPII_DICT)
 
-path_without_extension, mat_extension = os.path.splitext(MPII_ANNOTATIONS_PATH)
-json_path = f'{path_without_extension}.json'
-
-with open(json_path, 'w') as file:
+with open(MPII_ANNOTATIONS_JSON_NAME, 'w') as file:
     file.write(MPII_STR)
 
 """
@@ -58,8 +56,20 @@ dict_keys(['annolist', 'img_train', 'version', 'single_person', 'act', 'video_li
 
 annolist (type: list) is a list of dicts, 24987 length
 first element:
-{'image': {'name': '037454012.jpg'}, 'annorect': [{'scale': 3.8807339512004684, 'objpos': {'x': '601', 'y': '380'}}], 
-'frame_sec': [], 'vididx': []}
+{
+    'image': {'name': '037454012.jpg'},
+    'annorect': [
+        {
+            'scale': 3.8807339512004684,
+            'objpos': {
+                'x': '601',
+                'y': '380'
+            }
+        }
+    ],
+    'frame_sec': [],
+    'vididx': []
+}
 
 img_train (type: list), 24987 length
 0-1 values wether it is train or test
