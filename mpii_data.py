@@ -61,10 +61,12 @@ def gaussian_kernel(size_w, size_h, center_x, center_y, sigma):
 
 
 class MPII(data.Dataset):
-    def __init__(self, root_dir, sigma, is_train, transform=None):
+    def __init__(self, root_dir, sigma, is_train
+                # ,transform=None
+                ):
         self.width       = 368
         self.height      = 368
-        self.transformer = transform
+        # self.transformer = transform
         self.is_train    = is_train
         self.sigma       = sigma
         self.parts_num   = 16
@@ -112,9 +114,10 @@ class MPII(data.Dataset):
 
         img_path  = self.images_dir + variable['img_paths']
         
-        # BBox was added to the labels by the authors to perform additional training and testing, as referred in the paper.
+        # BBox was added to the labels by the authors to perform additional
+        # training and testing, as referred in the paper.
         # Intentionally left as comment since it is not part of the dataset.
-#         bbox      = np.load(self.labels_dir + "BBOX/" + variable['img_paths'][:-4] + '.npy')
+        # bbox = np.load(self.labels_dir + "BBOX/" + variable['img_paths'][:-4] + '.npy')
 
         points = torch.Tensor(variable['joint_self'])
         center = torch.Tensor(variable['objpos'])
@@ -129,24 +132,25 @@ class MPII(data.Dataset):
         # Single Person
         nParts = points.size(0)
         img    = cv2.imread(img_path)
-#         box    = np.zeros((2,2))
+        # box    = np.zeros((2,2))
 
-#         for i in range(bbox.shape[0]):
-#             if center[0] > bbox[i,0] and center[0] < bbox[i,2] and\
-#                center[1] > bbox[i,1] and center[1] < bbox[i,3]:
+        # for i in range(bbox.shape[0]):
+        #     if center[0] > bbox[i,0] and center[0] < bbox[i,2] and\
+        #        center[1] > bbox[i,1] and center[1] < bbox[i,3]:
 
-#                upperLeft   = bbox[i,0:2].astype(int)
-#                bottomRight = bbox[i,-2:].astype(int)
-#                box = bbox[i,:]
+        #        upperLeft   = bbox[i,0:2].astype(int)
+        #        bottomRight = bbox[i,-2:].astype(int)
+        #        box = bbox[i,:]
 
-#                img[:,0:upperLeft[0],:]  = np.ones(img[:,0:upperLeft[0],:].shape) *255
-#                img[0:upperLeft[1],:,:]  = np.ones(img[0:upperLeft[1],:,:].shape) *255
-#                img[:,bottomRight[0]:,:] = np.ones(img[:,bottomRight[0]:,:].shape)*255
-#                img[bottomRight[1]:,:,:] = np.ones(img[bottomRight[1]:,:,:].shape)*255
+        #        img[:,0:upperLeft[0],:]  = np.ones(img[:,0:upperLeft[0],:].shape) *255
+        #        img[0:upperLeft[1],:,:]  = np.ones(img[0:upperLeft[1],:,:].shape) *255
+        #        img[:,bottomRight[0]:,:] = np.ones(img[:,bottomRight[0]:,:].shape)*255
+        #        img[bottomRight[1]:,:,:] = np.ones(img[bottomRight[1]:,:,:].shape)*255
 
-#                break
+        #        break
 
-        # img, upperLeft, bottomRight, points, center = crop(img, points, center, scale, [self.height, self.width])
+        # img, upperLeft, bottomRight, points, center = crop(
+        #   img, points, center, scale, [self.height, self.width])
 
         kpt = points
 
@@ -157,7 +161,9 @@ class MPII(data.Dataset):
             img = cv2.resize(img,(368,368))
         height, width, _ = img.shape
 
-        heatmap = np.zeros((int(height/self.stride), int(width/self.stride), int(len(kpt)+1)), dtype=np.float32)
+        heatmap = np.zeros(
+            (int(height/self.stride), int(width/self.stride), int(len(kpt)+1)),
+            dtype=np.float32)
         for i in range(len(kpt)):
             # resize from 368 to 46
             x = int(kpt[i][0]) * 1.0 / self.stride
