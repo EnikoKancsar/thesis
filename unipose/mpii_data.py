@@ -1,9 +1,10 @@
 # -*-coding:UTF-8-*-
 from __future__ import print_function, absolute_import
-import numpy as np
 import json
-import cv2
 import os
+
+import cv2
+import numpy as np
 import torch
 import torch.utils.data as data
 

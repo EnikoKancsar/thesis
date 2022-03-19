@@ -1,26 +1,27 @@
 # -*-coding:UTF-8-*-
 import argparse
-import torch
-import torch.optim
-import torch.nn as nn
-import torch.backends.cudnn as cudnn
 import sys
-import numpy as np
+
 import cv2  # image analysis
-sys.path.append("..")
-from unipose.utils import get_model_summary
-from utils.utils import adjust_learning_rate
-from utils.utils import printAccuracies
-from unipose.utils import getDataloader
-from utils.utils import draw_paint
-from unipose.utils       import evaluate
-from utils.utils import get_kpts
-
-from model.unipose import Unipose
-
+import numpy as np
+import torch
+import torch.backends.cudnn as cudnn
+import torch.nn as nn
+from torch.nn.functional import interpolate
+import torch.optim
 from tqdm import tqdm  # Progress Bar Creator
 
-from torch.nn.functional import interpolate
+sys.path.append("..")
+
+from unipose.model.unipose import Unipose
+from unipose.utils import get_model_summary
+from unipose.utils import getDataloader
+
+from unipose.utils import adjust_learning_rate
+from unipose.utils import draw_paint
+from unipose.utils import evaluate
+from unipose.utils import get_kpts
+from unipose.utils import printAccuracies
 
 
 class Trainer(object):

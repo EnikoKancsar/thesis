@@ -1,13 +1,14 @@
 from collections import namedtuple
+import os
+
 import numpy as np
 from torch import LongTensor
 from torch import nn
 from torch import prod
-import os
+from torch.utils.data import DataLoader
 
 from unipose.mpii_data import MPII
-from torch.utils.data import DataLoader
-# import transforms
+# import unipose.transforms
 
 
 def gaussian_kernel(size_w, size_h, center_x, center_y, sigma):
