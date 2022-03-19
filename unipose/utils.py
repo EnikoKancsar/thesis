@@ -7,7 +7,7 @@ from torch import nn
 from torch import prod
 from torch.utils.data import DataLoader
 
-from unipose.mpii_data import MPII
+from unipose.data.mpii import MPII
 # import unipose.transforms
 
 
