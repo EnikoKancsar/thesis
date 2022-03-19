@@ -1,11 +1,13 @@
 import json
 from pprint import pprint
 
+import conf
+
 paths = [
-    r'C:\Users\Eniko\College\Szakdolgozat\Datasets\MPII\json\test.json',
-    r'C:\Users\Eniko\College\Szakdolgozat\Datasets\MPII\json\train.json',
-    r'C:\Users\Eniko\College\Szakdolgozat\Datasets\MPII\json\trainval.json',
-    r'C:\Users\Eniko\College\Szakdolgozat\Datasets\MPII\json\valid.json'
+    conf.MPII_DHRN_DIR + r'\test.json',
+    conf.MPII_DHRN_DIR + r'n\train.json',
+    conf.MPII_DHRN_DIR + r'\trainval.json',
+    conf.MPII_DHRN_DIR + r'\valid.json'
 ]
 for path in paths:
     with open(path, 'r') as file:
