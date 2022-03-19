@@ -82,7 +82,7 @@ class MPII(data.Dataset):
         self.train_list = []
         self.val_list   = []
 
-        for idx,val in enumerate(self.anno):
+        for idx, val in enumerate(self.anno):
             if val['isValidation'] == True:
                 self.val_list.append(idx)
             else:
