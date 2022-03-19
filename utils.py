@@ -4,10 +4,9 @@ from torch import nn
 from torch import prod
 import os
 
-from lsp_data import LSP_Data
 from mpii_data import MPII
 from torch.utils.data import DataLoader
-import transforms
+# import transforms
 
 
 def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
@@ -123,35 +122,24 @@ def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
 
 def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
                   workers, batch_size):
-    if dataset == 'LSP':
-        train_loader = DataLoader(
-            LSP_Data('lspet', train_dir, sigma, stride,
-                     transforms.Compose([transforms.RandomHorizontalFlip(),])),
-            batch_size=batch_size, shuffle=True, num_workers=workers,
-            pin_memory=True)
-
-        val_loader = DataLoader(
-            LSP_Data('lsp', val_dir, sigma, stride,
-                     transforms.Compose([transforms.TestResized(368),])),
-            batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
-
-        test_loader = 0
-
-    elif dataset == 'MPII':
+    if dataset == 'MPII':
         train_loader = DataLoader(
             MPII(train_dir, sigma, "Train",
-                 transforms.Compose([transforms.TestResized(368),])),
+                #  transforms.Compose([transforms.TestResized(368),])
+                 ),
             batch_size=batch_size, shuffle=True, num_workers=workers,
             pin_memory=True)
 
         val_loader = DataLoader(
             MPII(val_dir, sigma, "Val",
-                 transforms.Compose([transforms.TestResized(368),])),
+                #  transforms.Compose([transforms.TestResized(368),])
+                 ),
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
         test_loader = DataLoader(
             MPII(test_dir, sigma, "Val",
-                 transforms.Compose([transforms.TestResized(368),])),
+                #  transforms.Compose([transforms.TestResized(368),])
+                 ),
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
     return train_loader, val_loader, test_loader
