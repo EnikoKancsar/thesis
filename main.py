@@ -254,7 +254,8 @@ to be loaded with torch.load().
 """)
 parser.add_argument('--dataset', default='LSP', choices=['LSP', 'MPII'], type=str, help='')
 parser.add_argument('--train_dir', default='/PATH/TO/TRAIN', type=str, help='')
-parser.add_argument('--val_dir', default='/PATH/TO/LSP/VAL', type=str, help='')
+parser.add_argument('--val_dir', default='/PATH/TO/VAL', type=str, help='')
+parser.add_argument('--test_dir', default=None, type=str, help='')
 parser.add_argument('--model_name', default=None, type=str, help="""
 Used as a filename to save the best performing model.
 """)
@@ -271,6 +272,7 @@ if args.dataset == 'LSP':
 elif args.dataset == 'MPII':
     args.train_dir  = '/PATH/TO/MPIII/TRAIN'
     args.val_dir    = '/PATH/TO/MPIII/VAL'
+    args.test_dir   = '/PATH/TO/MPIII/TEST'
 
 trainer = Trainer(args)
 
