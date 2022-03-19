@@ -6,37 +6,38 @@ Utilised:
 
 ## Install dependencies
 
-The program uses Python 3.9.
+Using Python 3.9, PyTorch 1.10.2.
+PyTorch has to be installed separately from the other requirements.
 ```
 $ pip3 install torch==1.10.2+cu113 torchvision==0.11.3+cu113 torchaudio==0.10.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 $ pip install -r requirements.txt
 ```
 
 `-r, --requirement <file>`:
-Install from the given requirements file. This option can be used multiple times.
+Install from the given requirements file.
 
 ## Arguments
 
-- pretrained
+- `--pretrained`
     * If the model is pretrained, specify the path to the pretrained weights from where they can be loaded with torch.load()
     * '/PATH/TO/WEIGHTS'
     * default=None
-- dataset
+- `--dataset`
     * choices=['LSP', 'MPII'], default='LSP'
-- train_dir
+- `--train_dir`
     * default='/PATH/TO/TRAIN'
-- val_dir
+- `--val_dir`
     * default='/PATH/TO/LSP/VAL'
-- model_name (default=None)
+- `--model_name` (default=None)
     * Only used as a filename to save the torch model.
 Added:
-- test
+- `--test`
     * bool, default=False
     * If True, the model will do testing instead of training.
     * Refactored from the original code commenting out way.
 Removed from the original:
-- model_arch (default='unipose')
-    * Never actually used, only passed on without utilizing.
+- `--model_arch` (default='unipose')
+    * Passed down without actually being used ever.
 
 ## Command
 
