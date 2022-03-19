@@ -110,27 +110,27 @@ def to_tensor(pic):
 
 
 
-class Compose(object):
-    """Composes several transforms together.
+# class Compose(object):
+#     """Composes several transforms together.
 
-    Example:
-        >>> transforms.Compose([
-        >>>      transforms.RandomResized(),
-        >>>      transforms.RandomRotate(40),
-        >>>      transforms.RandomCrop(368),
-        >>>      transforms.RandomHorizontalFlip(),
-        >>> ])
-    """
+#     Example:
+#         >>> transforms.Compose([
+#         >>>      transforms.RandomResized(),
+#         >>>      transforms.RandomRotate(40),
+#         >>>      transforms.RandomCrop(368),
+#         >>>      transforms.RandomHorizontalFlip(),
+#         >>> ])
+#     """
 
-    def __init__(self, transforms):
-        self.transforms = transforms
+#     def __init__(self, transforms):
+#         self.transforms = transforms
 
-    def __call__(self, img, kpt, center, scale=None):
+#     def __call__(self, img, kpt, center, scale=None):
 
-        for t in self.transforms:
-            if isinstance(t, RandomResized):
-                img, kpt, center = t(img, kpt, center, scale)
-            else:
-                img, kpt, center = t(img, kpt, center)
+#         for t in self.transforms:
+#             if isinstance(t, RandomResized):
+#                 img, kpt, center = t(img, kpt, center, scale)
+#             else:
+#                 img, kpt, center = t(img, kpt, center)
 
-        return img, kpt, center
+#         return img, kpt, center
