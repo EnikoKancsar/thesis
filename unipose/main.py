@@ -1,6 +1,5 @@
 # -*-coding:UTF-8-*-
 import argparse
-import sys
 
 import cv2  # image analysis
 import numpy as np
