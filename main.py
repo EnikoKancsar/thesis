@@ -37,7 +37,7 @@ class Trainer(object):
         self.lr           = 0.0001
         self.gamma        = 0.333
         self.step_size    = 13275
-        self.sigma        = 3
+        self.sigma        = 3  # for sigma-tuning of gaussian kernel
         self.stride       = 8
 
         cudnn.benchmark   = True  # good when input sizes do not vary
