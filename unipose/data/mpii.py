@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-from conf import MPII_ANNOTATIONS_JSON_PATH
+from conf import MPII_FILE_ANNOTATIONS_JSON
 import unipose.transforms as transforms
 from unipose.utils import gaussian_kernel
 
@@ -77,7 +77,7 @@ class MPII(data.Dataset):
         self.numPeople     = []
 
 
-        with open(MPII_ANNOTATIONS_JSON_PATH) as anno_file:
+        with open(MPII_FILE_ANNOTATIONS_JSON) as anno_file:
             self.annotations = json.load(anno_file)
 
         self.train_list = []

@@ -5,11 +5,11 @@ from numpy import ndarray
 from numpy import uint16, uint8, int16
 from scipy import io
 
-from conf import MPII_ANNOTATIONS_MAT_PATH
-from conf import MPII_ANNOTATIONS_JSON_PATH
+from conf import MPII_FILE_ANNOTATIONS_MAT
+from conf import MPII_FILE_ANNOTATIONS_JSON
 
 
-MPII_MAT = io.loadmat(MPII_ANNOTATIONS_MAT_PATH, struct_as_record=False)["RELEASE"]
+MPII_MAT = io.loadmat(MPII_FILE_ANNOTATIONS_MAT, struct_as_record=False)["RELEASE"]
 
 MUST_BE_LIST = ["annolist", "annorect", "point", "img_train", "single_person",
                 "act", "video_list"]
@@ -46,7 +46,7 @@ def generate_dataset_obj(obj):
 MPII_DICT = generate_dataset_obj(MPII_MAT)
 MPII_STR = json.dumps(MPII_DICT)
 
-with open(MPII_ANNOTATIONS_JSON_PATH, 'w') as file:
+with open(MPII_FILE_ANNOTATIONS_JSON, 'w') as file:
     file.write(MPII_STR)
 
 """
