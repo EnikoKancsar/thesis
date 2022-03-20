@@ -25,6 +25,3 @@ MPII_DIR_IMAGES_TRAIN = r'C:\...\MPII\train_dir'
 
 # Val dir
 MPII_DIR_IMAGES_VAL = r'C:\...\MPII\val_dir'
-
-# Directory of Deep High Resolution Net .json MPII annotation files
-MPII_DHRN_DIR = ''
