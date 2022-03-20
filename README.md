@@ -49,7 +49,7 @@ python mpii_annot_json_so.py
 * act(imgidx) - activity/category label for image imgidx
     * act_name - activity name
     * cat_name - category name
-    * act_id - activiti
+    * act_id - activity id
 * vid
 
 #### Deep High Resolution Net Version
