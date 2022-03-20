@@ -2,11 +2,11 @@
 
 import json
 from numpy import ndarray
-# from numpy import uint16, uint8, int16
+from numpy import uint16, uint8, int16
 from scipy import io
 
 from conf import MPII_ANNOTATIONS_MAT_PATH
-from conf import MPII_ANNOTATIONS_JSON_NAME
+from conf import MPII_ANNOTATIONS_JSON_PATH
 
 
 MPII_MAT = io.loadmat(MPII_ANNOTATIONS_MAT_PATH, struct_as_record=False)["RELEASE"]
@@ -22,13 +22,10 @@ def generate_dataset_obj(obj):
         else:
             ret = []
             for i in range(dim):
-                # val = generate_dataset_obj(obj[i])
-                # if isinstance(val, (uint8, uint16, int16)):
-                #     # val = int(val)
-                #     val = str(val)
-
-                # I'm not sure if this is actually okay :///
-                ret.append(str(generate_dataset_obj(obj[i])))
+                val = generate_dataset_obj(obj[i])
+                if isinstance(val, (uint8, uint16, int16)):
+                    val = int(val)
+                ret.append(val)
 
     # elif type(obj) == io.matlab.mio5_params.mat_struct:
     # DeprecationWarning: Please use `mat_struct` from the `scipy.io.matlab` 
@@ -39,6 +36,8 @@ def generate_dataset_obj(obj):
             field = generate_dataset_obj(obj.__dict__[field_name])
             if field_name in MUST_BE_LIST and not isinstance(field, list):
                 field = [field]
+            if isinstance(field, (uint8, uint16, int16)):
+                    field = int(field)
             ret[field_name] = field
     else:
         ret = obj
@@ -47,15 +46,21 @@ def generate_dataset_obj(obj):
 MPII_DICT = generate_dataset_obj(MPII_MAT)
 MPII_STR = json.dumps(MPII_DICT)
 
-with open(MPII_ANNOTATIONS_JSON_NAME, 'w') as file:
+with open(MPII_ANNOTATIONS_JSON_PATH, 'w') as file:
     file.write(MPII_STR)
 
 """
 MPII_DICT
-dict_keys(['annolist', 'img_train', 'version', 'single_person', 'act', 'video_list'])
+{
+    'annolist': [24987 dict elem],
+    'img_train': [24987 dict elem],
+    'version': 12,
+    'single_person': [24987 dict elem],
+    'act': [24987 dict elem],
+    'video_list': [2821 video id]
+}
 
-annolist (type: list) is a list of dicts, 24987 length
-first element:
+annolist first element:
 {
     'image': {'name': '037454012.jpg'},
     'annorect': [
@@ -74,11 +79,9 @@ first element:
 img_train (type: list), 24987 length
 0-1 values wether it is train or test
 # print(MPII_DICT['img_train'].count(0))
-# print(MPII_DICT['img_train'].count(1))
-# print(len(MPII_DICT['img_train']))
 # 6908
+# print(MPII_DICT['img_train'].count(1))
 # 18079
-# 24987
 
 version (type: numpy.str_)
 12
@@ -96,4 +99,5 @@ act (type: list), 24987 length
 videolist (type: list), 2821 length
 'zuhzWKbRq6s', 'zvMWkSAcSVc', 'zwqQrtD2L84', 'zz5DvBqit8A'
 https://www.youtube.com/watch?v=...
+
 """
