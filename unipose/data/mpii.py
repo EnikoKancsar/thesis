@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
+from conf import MPII_ANNOTATIONS_JSON_PATH
 import unipose.transforms as transforms
 from unipose.utils import gaussian_kernel
 
@@ -76,13 +77,13 @@ class MPII(data.Dataset):
         self.numPeople     = []
 
 
-        with open(self.labels_dir+"mpii_annotations.json") as anno_file:
-            self.anno = json.load(anno_file)
+        with open(MPII_ANNOTATIONS_JSON_PATH) as anno_file:
+            self.annotations = json.load(anno_file)
 
         self.train_list = []
         self.val_list   = []
 
-        for idx, val in enumerate(self.anno):
+        for idx, val in enumerate(self.annotations):
             if val['isValidation'] == True:
                 self.val_list.append(idx)
             else:
@@ -101,11 +102,11 @@ class MPII(data.Dataset):
     def __getitem__(self, index):
         scale_factor = 0.25
 
-        variable = self.anno[self.img_List[index]]
+        variable = self.annotations[self.img_List[index]]
         
         while not os.path.isfile(self.labels_dir + variable['img_paths'][:-4]+'.png'):
             index = index - 1
-            variable = self.anno[self.img_List[index]]
+            variable = self.annotations[self.img_List[index]]
 
         img_path  = self.images_dir + variable['img_paths']
         
