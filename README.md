@@ -22,12 +22,28 @@ The annotations have a `.mat` extension which has to be converted to `.json` for
 
 After research this json conversion couldn't be found and also proved to have an annotation structure that differs from the original and isn't documented, therefore I introduced a new conversion based on: [Qi Zhang@StackOverflow](https://stackoverflow.com/a/61074404/13497164).
 
-After specifying the path in your `conf.py`, run this script.
+In your `conf.py` you have to specify
+
+* where to load from
+    * the `.mat` annotation file (`MPII_FILE_ANNOTATIONS_MAT`)
+    * the folder that contains the images (`MPII_DIR_IMAGES`)
+* where to write the train data
+    * a directory for the train images (`MPII_DIR_IMAGES_TRAIN`)
+    * a file path for the train annotations file (`MPII_FILE_ANNOTATIONS_JSON_TRAIN`)
+* where to write the val data
+    * a directory for the val images (`MPII_DIR_IMAGES_VAL`)
+    * a file path for the val annotations file (`MPII_FILE_ANNOTATIONS_JSON_VAL`)
+
+Basically after the conversion you will have the mat annotations file, the json annotations file, the images folder, and a folder and a json annotations file containing the train and val images&annotations only.
+
+After setting up your `conf.py` run this script.
 ```
-python mpii_annot_json_so.py
+python prepare_mpii.py
 ```
 
 ##### Annotation structure
+
+Original:
 
 * annolist(imgidx) - annotations for image imgidx
     * image
@@ -49,6 +65,32 @@ python mpii_annot_json_so.py
     * cat_name - category name
     * act_id - activity id
 * vid
+
+After conversion:
+```
+{
+    'act': {
+        'act_id': -1,
+        'act_name': [],
+        'cat_name': []
+    },
+    'annolist': {
+        'annorect': [
+            {
+                'objpos': {'x': 424, 'y': 382},
+                'scale': 2.563847109326139
+            },  
+            {
+                'objpos': {'x': 615, 'y': 426},
+                'scale': 1.8672246785001532
+            }
+        ],
+        'frame_sec': [],
+        'image': {'name': '001386214.jpg'},
+        'vididx': []
+    },
+    'single_person': [1, 2]}
+```
 
 # Command line usage
 

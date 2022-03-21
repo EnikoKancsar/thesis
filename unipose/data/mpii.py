@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-from conf import MPII_FILE_ANNOTATIONS_JSON
+import conf
 import unipose.transforms as transforms
 from unipose.utils import gaussian_kernel
 
@@ -68,45 +68,28 @@ class MPII(data.Dataset):
         self.parts_num   = 16
         self.stride      = stride
 
-        self.labels_dir  = root_dir
-        self.images_dir  = root_dir + 'images/'
-
         self.videosFolders = {}
         self.labelFiles    = {}
         self.full_img_List = {}
         self.numPeople     = []
 
+        self.labels_dir, self.images_dir, anno_file = (
+            (conf.MPII_DIR_IMAGES, conf.MPII_DIR_IMAGES_TRAIN, conf.MPII_FILE_ANNOTATIONS_JSON_TRAIN)
+            if self.is_train is True
+            else (conf.MPII_DIR_IMAGES, conf.MPII_DIR_IMAGES_VAL, conf.MPII_FILE_ANNOTATIONS_JSON_VAL)
+        )
 
-        with open(MPII_FILE_ANNOTATIONS_JSON) as anno_file:
+        with open(anno_file) as anno_file:
             self.annotations = json.load(anno_file)
-
-        self.train_list = []
-        self.val_list   = []
-
-        for idx, val in enumerate(self.annotations):
-            if val['isValidation'] == True:
-                self.val_list.append(idx)
-            else:
-                self.train_list.append(idx)
-
-
-        if is_train == "Train":
-            self.img_List = self.train_list
-            print("Train images ", len(self.img_List))
-
-        elif is_train == "Val":
-            self.img_List = self.val_list
-            print("Val images ", len(self.img_List))
-
 
     def __getitem__(self, index):
         scale_factor = 0.25
 
-        variable = self.annotations[self.img_List[index]]
+        variable = self.annotations[index]
         
         while not os.path.isfile(self.labels_dir + variable['img_paths'][:-4]+'.png'):
             index = index - 1
-            variable = self.annotations[self.img_List[index]]
+            variable = self.annotations[index]
 
         img_path  = self.images_dir + variable['img_paths']
         
@@ -196,6 +179,5 @@ class MPII(data.Dataset):
 
         return img, heatmap, centermap, img_path
 
-
     def __len__(self):
-        return len(self.img_List)
+        return len(self.annotations)

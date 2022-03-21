@@ -142,7 +142,7 @@ def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
 def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
                   workers, batch_size):
     """ torch.utils.data.Dataloader
-    
+
     :param dataset: 
     :param batch_size (int, optional, default=1)
         how many samples per batch to load
@@ -158,20 +158,20 @@ def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
 
     if dataset == 'MPII':
         train_loader = DataLoader(
-            MPII(train_dir, sigma, "Train", stride
+            MPII(train_dir, sigma, True, stride
                 #  transforms.Compose([transforms.TestResized(368),])
                  ),
             batch_size=batch_size, shuffle=True, num_workers=workers,
             pin_memory=True)
 
         val_loader = DataLoader(
-            MPII(val_dir, sigma, "Val",
+            MPII(val_dir, sigma, False, stride
                 #  transforms.Compose([transforms.TestResized(368),])
                  ),
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
         test_loader = DataLoader(
-            MPII(test_dir, sigma, "Val",
+            MPII(test_dir, sigma, False, stride
                 #  transforms.Compose([transforms.TestResized(368),])
                  ),
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
