@@ -113,7 +113,7 @@ Install from the given requirements file.
     * '/PATH/TO/WEIGHTS'
     * default=None
 - `--dataset`
-    * choices=['LSP', 'MPII'], default='LSP'
+    * choices=['MPII'], default='MPII'
 - `--model_name` (default=None)
     * Only used as a filename to save the torch model.
 Added:

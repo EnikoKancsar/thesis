@@ -247,14 +247,13 @@ parser.add_argument('--pretrained', default=None, type=str, help="""
 If you wish to use pretrained weights, specify their path with this option
 to be loaded with torch.load().
 """)
-parser.add_argument('--dataset', default='LSP', choices=['LSP', 'MPII'],
-                    type=str, help='')
-parser.add_argument('--model_name', default=None, type=str, help="""
-Used as a filename to save the best performing model.
-""")
-parser.add_argument('--test', default=False, choices=[False, True], type=bool, help="""
-If True/1, the model will do testing instead of training.
-""")
+parser.add_argument('--dataset', default='MPII', choices=['MPII'], type=str)
+parser.add_argument(
+    '--model_name', default=None, type=str,
+    help="Used as a filename to save the best performing model.")
+parser.add_argument(
+    '--test', default=False, choices=[False, True], type=bool,
+    help="If True, the model will do testing instead of training.")
 
 args = parser.parse_args()
 
