@@ -4,11 +4,11 @@ Utilised:
 
 # Configuration
 
-The `conf_sample.py` file contains config data, like paths that are relative to local.
+The `conf_sample.ini` file contains config data, like paths that are relative to local.
 
-Either rename it to `conf.py` or copy it.
+Either rename it to `conf.ini` or copy it.
 ```
-cp conf_sample.py conf.py
+cp conf_sample.ini conf.ini
 ```
 Then fill it in with your local data.
 
@@ -22,21 +22,21 @@ The annotations have a `.mat` extension which has to be converted to `.json` for
 
 After research this json conversion couldn't be found and also proved to have an annotation structure that differs from the original and isn't documented, therefore I introduced a new conversion based on: [Qi Zhang@StackOverflow](https://stackoverflow.com/a/61074404/13497164).
 
-In your `conf.py` you have to specify
+In your `conf.ini` you have to specify
 
 * where to load from
-    * the `.mat` annotation file (`MPII_FILE_ANNOTATIONS_MAT`)
-    * the folder that contains the images (`MPII_DIR_IMAGES`)
+    * the `.mat` annotation file (`MPII.ANNOTATIONS_MAT`)
+    * the folder that contains the images (`MPII.DIR_IMAGES`)
 * where to write the train data
-    * a directory for the train images (`MPII_DIR_IMAGES_TRAIN`)
-    * a file path for the train annotations file (`MPII_FILE_ANNOTATIONS_JSON_TRAIN`)
+    * a directory for the train images (`MPII._DIR_IMAGES_TRAIN`)
+    * a file path for the train annotations file (`MPII.ANNOTATIONS_TRAIN`)
 * where to write the val data
-    * a directory for the val images (`MPII_DIR_IMAGES_VAL`)
-    * a file path for the val annotations file (`MPII_FILE_ANNOTATIONS_JSON_VAL`)
+    * a directory for the val images (`MPII.DIR_IMAGES_VAL`)
+    * a file path for the val annotations file (`MPII.ANNOTATIONS_VAL`)
 
 Basically after the conversion you will have the mat annotations file, the json annotations file, the images folder, and a folder and a json annotations file containing the train and val images&annotations only.
 
-After setting up your `conf.py` run this script.
+After setting up your `conf.ini` run this script.
 ```
 python prepare_mpii.py
 ```

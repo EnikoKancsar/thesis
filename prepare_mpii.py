@@ -1,5 +1,6 @@
 # Source: https://stackoverflow.com/a/61074404/13497164
 
+import configparser
 import json
 import shutil
 
@@ -7,10 +8,12 @@ from numpy import ndarray
 from numpy import uint16, uint8, int16
 from scipy import io
 
-import conf
+
+CONF = configparser.ConfigParser()
+CONF.read('./conf.ini')
 
 
-MPII_MAT = io.loadmat(conf.MPII_FILE_ANNOTATIONS_MAT, struct_as_record=False)["RELEASE"]
+MPII_MAT = io.loadmat(CONF.get("MPII", "ANNOTATIONS_MAT"), struct_as_record=False)["RELEASE"]
 
 MUST_BE_LIST = ["annolist", "annorect", "point", "img_train", "single_person",
                 "act", "video_list"]
@@ -46,13 +49,13 @@ MPII_LIST_TRAIN, MPII_LIST_VAL = [], []
 
 for index, value in enumerate(MPII_DICT['img_train']):
     dest_dir, annotation_list = (
-        (conf.MPII_DIR_IMAGES_TRAIN, MPII_LIST_TRAIN) 
+        (CONF.get("MPII", "DIR_IMAGES_TRAIN"), MPII_LIST_TRAIN) 
         if value == 1
-        else (conf.MPII_DIR_IMAGES_VAL, MPII_LIST_VAL)
+        else (CONF.get("MPII", "DIR_IMAGES_VAL"), MPII_LIST_VAL)
     )
     file_name = MPII_DICT['annolist'][index]['image']['name']
     try:
-        shutil.copy(conf.MPII_DIR_IMAGES + '\\' + file_name, dest_dir)
+        shutil.copy(CONF.get("MPII", "DIR_IMAGES") + '\\' + file_name, dest_dir)
     except FileNotFoundError as err:    
         continue
     annotation_list.append({
@@ -63,13 +66,13 @@ for index, value in enumerate(MPII_DICT['img_train']):
 
 
 try:
-    with open(conf.MPII_FILE_ANNOTATIONS_JSON_TRAIN, 'w') as file:
+    with open(CONF.get("MPII", "ANNOTATIONS_TRAIN"), 'w') as file:
         file.write(json.dumps(MPII_LIST_TRAIN))
 except FileNotFoundError as err:
     print('Path to train annotations file not specified. Please edit your config file.')
 
 try:
-    with open(conf.MPII_FILE_ANNOTATIONS_JSON_VAL, 'w') as file:
+    with open(CONF.get("MPII", "ANNOTATIONS_VAL"), 'w') as file:
         file.write(json.dumps(MPII_LIST_VAL))
 except FileNotFoundError as err:
     print('Path to val annotations file not specified. Please edit your config file.')

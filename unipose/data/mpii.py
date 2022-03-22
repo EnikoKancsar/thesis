@@ -1,5 +1,5 @@
 # -*-coding:UTF-8-*-
-from __future__ import print_function, absolute_import
+import configparser
 import json
 import os
 
@@ -8,10 +8,12 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-import conf
 import unipose.transforms as transforms
 from unipose.utils import gaussian_kernel
 
+
+CONF = configparser.ConfigParser()
+CONF.read('./conf.ini')
 
 def get_transform(center, scale, resolution):
     h = 200 * scale
@@ -73,10 +75,13 @@ class MPII(data.Dataset):
         self.full_img_List = {}
         self.numPeople     = []
 
-        self.labels_dir, self.images_dir, anno_file = (
-            (conf.MPII_DIR_IMAGES, conf.MPII_DIR_IMAGES_TRAIN, conf.MPII_FILE_ANNOTATIONS_JSON_TRAIN)
+        self.labels_dir = CONF.get("MPII", "DIR_IMAGES")
+        self.images_dir, anno_file = (
+            (CONF.get("MPII", "DIR_IMAGES_TRAIN"),
+             CONF.get("MPII", "ANNOTATIONS_TRAIN"))
             if self.is_train is True
-            else (conf.MPII_DIR_IMAGES, conf.MPII_DIR_IMAGES_VAL, conf.MPII_FILE_ANNOTATIONS_JSON_VAL)
+            else (CONF.get("MPII", "DIR_IMAGES_VAL"),
+                  CONF.get("MPII", "ANNOTATIONS_VAL"))
         )
 
         with open(anno_file) as anno_file:
