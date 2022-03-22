@@ -10,13 +10,12 @@ from torch.nn.functional import interpolate
 import torch.optim
 from tqdm import tqdm  # Progress Bar Creator
 
+from unipose.evaluate import accuracy
 from unipose.model.unipose import Unipose
-from unipose.utils import get_model_summary
-from unipose.utils import getDataloader
-
 from unipose.utils import adjust_learning_rate
 from unipose.utils import draw_paint
-from unipose.utils import evaluate
+from unipose.utils import get_model_summary
+from unipose.utils import getDataloader
 from unipose.utils import get_kpts
 from unipose.utils import printAccuracies
 
@@ -146,7 +145,7 @@ class Trainer(object):
 
             tbar.set_description('Val loss: %.6f' % (val_loss / ((i + 1)*self.batch_size)))
 
-            acc, acc_PCK, acc_PCKh, cnt, pred, visible = evaluate.accuracy(
+            acc, acc_PCK, acc_PCKh, cnt, pred, visible = accuracy(
                 heat.detach().cpu().numpy(),
                 heatmap_var.detach().cpu().numpy(),
                 0.2, 0.5, self.dataset)

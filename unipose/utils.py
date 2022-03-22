@@ -1,6 +1,7 @@
 from collections import namedtuple
 import os
 
+import cv2  # image analysis
 import numpy as np
 from torch import LongTensor
 from torch import nn
@@ -26,6 +27,18 @@ def gaussian_kernel(size_w, size_h, center_x, center_y, sigma):
     gridy, gridx = np.mgrid[0:size_h, 0:size_w]
     D2 = (gridx - center_x) ** 2 + (gridy - center_y) ** 2
     return np.exp(-D2 / 2.0 / sigma / sigma)
+
+
+def adjust_learning_rate(optimizer, iters, base_lr, gamma, step_size,
+                         policy='step', multiple=[1]):
+    if policy == 'fixed':
+        lr = base_lr
+    elif policy == 'step':
+        lr = base_lr * (gamma ** (iters // step_size))
+
+    for i, param_group in enumerate(optimizer.param_groups):
+        param_group['lr'] = lr * multiple[i]
+    return lr
 
 
 def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
@@ -177,3 +190,119 @@ def getDataloader(dataset, train_dir, val_dir, test_dir, sigma, stride,
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
     return train_loader, val_loader, test_loader
+
+
+def get_kpts(maps, img_h = 368.0, img_w = 368.0):
+
+    # maps (1,15,46,46)
+    maps = maps.clone().cpu().data.numpy()
+    map_6 = maps[0]
+
+    kpts = []
+    for m in map_6[1:]:
+        h, w = np.unravel_index(m.argmax(), m.shape)
+        x = int(w * img_w / m.shape[1])
+        y = int(h * img_h / m.shape[0])
+        kpts.append([x,y])
+    return kpts
+
+
+
+def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
+
+           #       RED           GREEN           RED          YELLOW          YELLOW          PINK          GREEN
+    colors = [[000,000,255], [000,255,000], [000,000,255], [255,255,000], [255,255,000], [255,000,255], [000,255,000],\
+              [255,000,000], [255,255,000], [255,000,255], [000,255,000], [000,255,000], [000,000,255], [255,255,000], [255,000,000]]
+           #       BLUE          YELLOW          PINK          GREEN          GREEN           RED          YELLOW           BLUE
+
+    if dataset == "LSP":
+        limbSeq = [[13, 12], [12, 9], [12, 8], [9, 10], [8, 7], [10,11], [7, 6], [12, 3],\
+                    [12, 2], [ 2, 1], [ 1, 0], [ 3, 4], [4,  5], [15,16], [16,18], [17,18], [15,17]]
+        kpts[15][0] = kpts[15][0]  - 25
+        kpts[15][1] = kpts[15][1]  - 50
+        kpts[16][0] = kpts[16][0]  - 25
+        kpts[16][1] = kpts[16][1]  + 50
+        kpts[17][0] = kpts[17][0] + 25
+        kpts[17][1] = kpts[17][1] - 50
+        kpts[18][0] = kpts[18][0] + 25
+        kpts[18][1] = kpts[18][1] + 50
+
+    elif dataset == "MPII":
+                #    HEAD    R.SLDR  R.BICEP  R.FRARM   L.SLDR  L.BICEP  L.FRARM   TORSO    L.HIP   L.THIGH   L.CALF   R.HIP   R.THIGH   R.CALF  EXT.HEAD
+        limbSeq = [[ 8, 9], [ 7,12], [12,11], [11,10], [ 7,13], [13,14], [14,15], [ 7, 6], [ 6, 2], [ 2, 1], [ 1, 0], [ 6, 3], [ 3, 4], [ 4, 5], [ 7, 8]]
+
+    # im = cv2.resize(cv2.imread(img_path),(368,368))
+    # draw points
+    for k in kpts:
+        x = k[0]
+        y = k[1]
+        cv2.circle(im, (x, y), radius=3, thickness=-1, color=(0, 0, 255))
+
+    # draw lines
+    for i in range(len(limbSeq)):
+        cur_im = im.copy()
+        limb = limbSeq[i]
+        [Y0, X0] = kpts[limb[0]]
+        [Y1, X1] = kpts[limb[1]]
+        # mX = np.mean([X0, X1])
+        # mY = np.mean([Y0, Y1])
+        # length = ((X0 - X1) ** 2 + (Y0 - Y1) ** 2) ** 0.5
+        # angle = math.degrees(math.atan2(X0 - X1, Y0 - Y1))
+        # polygon = cv2.ellipse2Poly((int(mY), int(mX)), (int(length / 2), 4), int(angle), 0, 360, 1)
+        # cv2.fillConvexPoly(cur_im, polygon, colors[i])
+        # if X0!=0 and Y0!=0 and X1!=0 and Y1!=0:
+        #     im = cv2.addWeighted(im, 0.4, cur_im, 0.6, 0)
+
+        if X0!=0 and Y0!=0 and X1!=0 and Y1!=0:
+            if i<len(limbSeq)-4:
+                cv2.line(cur_im, (Y0,X0), (Y1,X1), colors[i], 5)
+            else:
+                cv2.line(cur_im, (Y0,X0), (Y1,X1), [0,0,255], 5)
+
+        im = cv2.addWeighted(im, 0.2, cur_im, 0.8, 0)
+
+    cv2.imwrite('samples/WASPpose/Pose/'+str(mapNumber)+'.png', im)
+
+
+def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
+    if dataset == "LSP":
+        print("\nmAP:   %.2f%%" % (mAP*100))
+        print("APs:     Void = %2.2f%%, Right Ankle = %2.2f%%,  Right Knee = %2.2f%%,   Right Hip = %2.2f%%,       Left Hip = %2.2f%%,"\
+            % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100))
+        print("    Left Knee = %2.2f%%,  Left Ankle = %2.2f%%, Right Wrist = %2.2f%%, Right Elbow = %2.2f%%, Right Shoulder = %2.2f%%,"\
+            % (AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100))
+        print("Left Shoulder = %2.2f%%,  Left Elbow = %2.2f%%,  Left Wrist = %2.2f%%,        Neck = %2.2f%%,       Head Top = %2.2f%%"\
+            % (AP[10]*100,AP[11]*100,AP[12]*100,AP[13]*100,AP[14]*100))
+
+
+        print("mPCK:  %.2f%%" % (mPCK*100))
+        print("PCKs:    Void = %2.2f%%, Right Ankle = %2.2f%%,  Right Knee = %2.2f%%,   Right Hip = %2.2f%%,       Left Hip = %2.2f%%,"\
+            % (PCK[0]*100,PCK[1]*100,PCK[2]*100,PCK[3]*100,PCK[4]*100))
+        print("    Left Knee = %2.2f%%,  Left Ankle = %2.2f%%, Right Wrist = %2.2f%%, Right Elbow = %2.2f%%, Right Shoulder = %2.2f%%,"\
+            % (PCK[5]*100,PCK[6]*100,PCK[7]*100,PCK[8]*100,PCK[9]*100))
+        print("Left Shoulder = %2.2f%%,  Left Elbow = %2.2f%%,  Left Wrist = %2.2f%%,        Neck = %2.2f%%,       Head Top = %2.2f%%"\
+            % (PCK[10]*100,PCK[11]*100,PCK[12]*100,PCK[13]*100,PCK[14]*100))
+
+        print("mPCKh: %.2f%%" % (mPCKh*100))
+        print("PCKhs:   Void = %2.2f%%, Right Ankle = %2.2f%%,  Right Knee = %2.2f%%,   Right Hip = %2.2f%%,       Left Hip = %2.2f%%,"\
+            % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100))
+        print("    Left Knee = %2.2f%%,  Left Ankle = %2.2f%%, Right Wrist = %2.2f%%, Right Elbow = %2.2f%%, Right Shoulder = %2.2f%%,"\
+            % (PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100))
+        print("Left Shoulder = %2.2f%%,  Left Elbow = %2.2f%%,  Left Wrist = %2.2f%%,        Neck = %2.2f%%,       Head Top = %2.2f%%"\
+            % (PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100))
+
+    elif dataset == "MPII":
+        print("\nmAP:   %.2f%%" % (mAP*100))
+        print("APs:   %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
+            % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100,AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100,PCKh[10]*100,\
+                AP[11]*100,AP[12]*100,AP[13]*100,AP[14]*100,AP[15]*100,AP[16]*100))
+
+        print("mPCK:  %.2f%%" % (mPCK*100))
+        print("PCKs:  %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
+            % (PCK[0]*100,PCK[1]*100,PCK[2]*100,PCK[3]*100,PCK[4]*100,PCK[5]*100,PCK[6]*100,PCK[7]*100,PCK[8]*100,PCK[9]*100,PCK[10]*100,\
+                PCK[11]*100,PCK[12]*100,PCK[13]*100,PCK[14]*100,PCK[15]*100,PCK[16]*100))
+
+        print("mPCKh: %.2f%%" % (mPCKh*100))
+        print("PCKhs: %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
+            % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100,PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100,\
+                PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100,PCKh[15]*100,PCKh[16]*100))
