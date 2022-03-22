@@ -1,5 +1,18 @@
 import torch
 
+
+def normalize(tensor, mean, std):
+    """Normalize a torch.tensor
+
+    :param tensor (torch.tensor): tensor to be normalized
+    :param mean: (list): the mean of BGR
+    :param std: (list): the std of BGR
+    """
+    for t, m, s in zip(tensor, mean, std):
+        t.sub_(m).div_(s)
+    return tensor
+
+
 def to_tensor(pic):
     """Convert a numpy.ndarray to tensor.
 
