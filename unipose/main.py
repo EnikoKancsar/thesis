@@ -1,5 +1,6 @@
 # -*-coding:UTF-8-*-
 import argparse
+import configparser
 
 import cv2  # image analysis
 import numpy as np
@@ -18,6 +19,10 @@ from unipose.utils import get_model_summary
 from unipose.utils import getDataloader
 from unipose.utils import get_kpts
 from unipose.utils import printAccuracies
+
+
+CONF = configparser.ConfigParser()
+CONF.read('./conf.ini')
 
 
 class Trainer(object):
@@ -195,7 +200,7 @@ class Trainer(object):
 
         for idx in range(1):
             print(idx,"/",2000)
-            img_path = '/PATH/TO/TEST/IMAGE'
+            img_path = CONF.get('TEST', 'DIR_IMAGES_TEST')
 
             center   = [184, 184]
 
