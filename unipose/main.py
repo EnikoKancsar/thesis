@@ -54,15 +54,15 @@ class Trainer(object):
         model = Unipose(num_classes=self.numClasses, output_stride=16,
                         freeze_bn=False, stride=self.stride)
 
-        self.model       = model.cuda()
+        self.model      = model.cuda()
 
-        self.criterion   = nn.MSELoss().cuda()
+        self.criterion  = nn.MSELoss().cuda()
 
-        self.optimizer   = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        self.optimizer  = torch.optim.Adam(self.model.parameters(), lr=self.lr)
 
-        self.best_model  = 12345678.9
+        self.best_model = 12345678.9
 
-        self.iters       = 0
+        self.iters      = 0
 
         if self.args.pretrained is not None:
             checkpoint = torch.load(self.args.pretrained)
@@ -113,7 +113,8 @@ class Trainer(object):
             loss.backward()
             self.optimizer.step()
 
-            tbar.set_description('Train loss: %.6f' % (train_loss / ((i + 1)*self.batch_size)))
+            tbar.set_description(
+                'Train loss: %.6f' % (train_loss / ((i + 1)*self.batch_size)))
 
             self.iters += 1
 
@@ -146,7 +147,8 @@ class Trainer(object):
 
             val_loss += loss_heat.item()
 
-            tbar.set_description('Val loss: %.6f' % (val_loss / ((i + 1)*self.batch_size)))
+            tbar.set_description(
+                'Val loss: %.6f' % (val_loss / ((i + 1)*self.batch_size)))
 
             acc, acc_PCK, acc_PCKh, cnt, pred, visible = accuracy(
                 heat.detach().cpu().numpy(),
@@ -240,9 +242,10 @@ class Trainer(object):
 
             heatmap = []
             for i in range(self.numClasses+1):
-                heatmap = cv2.applyColorMap(np.uint8(255*heat[:,:,i]), cv2.COLORMAP_JET)
+                heatmap = cv2.applyColorMap(
+                    np.uint8(255*heat[:,:,i]), cv2.COLORMAP_JET)
                 im_heat = cv2.addWeighted(im, 0.6, heatmap, 0.4, 0)
-                cv2.imwrite('samples/heat/unipose'+str(i)+'.png', im_heat)
+                cv2.imwrite('samples/heat/unipose' + str(i) + '.png', im_heat)
 
 
 parser = argparse.ArgumentParser()

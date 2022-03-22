@@ -9,7 +9,6 @@ from torch import prod
 from torch.utils.data import DataLoader
 
 from unipose.data.mpii import MPII
-# import unipose.transforms
 
 
 def gaussian_kernel(size_w, size_h, center_x, center_y, sigma):

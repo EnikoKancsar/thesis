@@ -88,7 +88,8 @@ class MPII(data.Dataset):
             heat_map[heat_map < 0.0099] = 0
             heatmap[:, :, i + 1] = heat_map
 
-        heatmap[:, :, 0] = 1.0 - np.max(heatmap[:, :, 1:], axis=2)  # for background
+        # for background
+        heatmap[:, :, 0] = 1.0 - np.max(heatmap[:, :, 1:], axis=2)
 
         centermap = np.zeros(
             (int(height/self.stride), int(width/self.stride), 1),
