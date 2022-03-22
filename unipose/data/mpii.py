@@ -15,56 +15,11 @@ from unipose.utils import gaussian_kernel
 CONF = configparser.ConfigParser()
 CONF.read('./conf.ini')
 
-def get_transform(center, scale, resolution):
-    h = 200 * scale
-    t = np.zeros((3, 3))
-    t[0, 0] = float(resolution[1]) / h
-    t[1, 1] = float(resolution[0]) / h
-    t[0, 2] = resolution[1] * (-float(center[0]) / h + .5)
-    t[1, 2] = resolution[0] * (-float(center[1]) / h + .5)
-    t[2, 2] = 1
-
-    return t
-
-
-def transformImage(pt, center, scale, resolution):
-    t = get_transform(center, scale, resolution)
-    t = np.linalg.inv(t)
-    new_pt = np.array([pt[0] - 1, pt[1] - 1, 1.]).T
-    new_pt = np.dot(t, new_pt)
-
-    return new_pt[:2].astype(int) + 1
-
-
-def crop(img, points, center, scale, resolution):
-    upperLeft   = np.array(transformImage([0, 0], center, scale, resolution))
-    bottomRight = np.array(transformImage(resolution, center, scale, resolution))
-
-    # Range to fill new array
-    new_x = max(0, -upperLeft[0]), min(bottomRight[0], img.shape[1]) - upperLeft[0]
-    new_y = max(0, -upperLeft[1]), min(bottomRight[1], img.shape[0]) - upperLeft[1]
-    # Range to sample from original image
-    old_x = max(0, upperLeft[0]), min(img.shape[1], bottomRight[0])
-    old_y = max(0, upperLeft[1]), min(img.shape[0], bottomRight[1])
-    new_img = img[old_y[0]:old_y[1], old_x[0]:old_x[1]]
-
-
-    points[:,0] = points[:,0] - max(0, upperLeft[0])# + max(0, -upperLeft[0])
-    points[:,1] = points[:,1] - max(0, upperLeft[1])# + max(0, -upperLeft[1])
-
-    center[0] -= max(0, upperLeft[0])
-    center[1] -= max(0, upperLeft[1])
-
-    return new_img, upperLeft, bottomRight, points, center
-
 
 class MPII(data.Dataset):
-    def __init__(self, sigma, is_train, stride=8
-                # ,transform=None
-                ):
+    def __init__(self, sigma, is_train, stride=8):
         self.width       = 368
         self.height      = 368
-        # self.transformer = transform
         self.is_train    = is_train
         self.sigma       = sigma
         self.parts_num   = 16
@@ -97,48 +52,21 @@ class MPII(data.Dataset):
             variable = self.annotations[index]
 
         img_path  = self.images_dir + variable['img_paths']
-        
-        # BBox was added to the labels by the authors to perform additional
-        # training and testing, as referred in the paper.
-        # Intentionally left as comment since it is not part of the dataset.
-        # bbox = np.load(self.labels_dir + "BBOX/" + variable['img_paths'][:-4] + '.npy')
 
         points = torch.Tensor(variable['joint_self'])
         center = torch.Tensor(variable['objpos'])
         scale  = variable['scale_provided']
 
-
         if center[0] != -1:
             center[1] = center[1] + 15*scale
             scale     = scale*1.25
 
-
         # Single Person
         nParts = points.size(0)
         img    = cv2.imread(img_path)
-        # box    = np.zeros((2,2))
-
-        # for i in range(bbox.shape[0]):
-        #     if center[0] > bbox[i,0] and center[0] < bbox[i,2] and\
-        #        center[1] > bbox[i,1] and center[1] < bbox[i,3]:
-
-        #        upperLeft   = bbox[i,0:2].astype(int)
-        #        bottomRight = bbox[i,-2:].astype(int)
-        #        box = bbox[i,:]
-
-        #        img[:,0:upperLeft[0],:]  = np.ones(img[:,0:upperLeft[0],:].shape) *255
-        #        img[0:upperLeft[1],:,:]  = np.ones(img[0:upperLeft[1],:,:].shape) *255
-        #        img[:,bottomRight[0]:,:] = np.ones(img[:,bottomRight[0]:,:].shape)*255
-        #        img[bottomRight[1]:,:,:] = np.ones(img[bottomRight[1]:,:,:].shape)*255
-
-        #        break
-
-        # img, upperLeft, bottomRight, points, center = crop(
-        #   img, points, center, scale, [self.height, self.width])
 
         kpt = points
 
-        # img, kpt, center = self.transformer(img, points, center)
         if img.shape[0] != 368 or img.shape[1] != 368:
             kpt[:,0] = kpt[:,0] * (368/img.shape[1])
             kpt[:,1] = kpt[:,1] * (368/img.shape[0])

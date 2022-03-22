@@ -170,22 +170,16 @@ def getDataloader(dataset, sigma, stride, workers, batch_size):
 
     if dataset == 'MPII':
         train_loader = DataLoader(
-            MPII(sigma, True, stride
-                #  transforms.Compose([transforms.TestResized(368),])
-                 ),
+            MPII(sigma, is_train=True, stride=stride),
             batch_size=batch_size, shuffle=True, num_workers=workers,
             pin_memory=True)
 
         val_loader = DataLoader(
-            MPII(sigma, False, stride
-                #  transforms.Compose([transforms.TestResized(368),])
-                 ),
+            MPII(sigma, is_train=False, stride=stride),
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
         test_loader = DataLoader(
-            MPII(sigma, False, stride
-                #  transforms.Compose([transforms.TestResized(368),])
-                 ),
+            MPII(sigma, is_train=False, stride=stride),
             batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
 
     return train_loader, val_loader, test_loader
