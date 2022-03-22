@@ -22,7 +22,6 @@ class MPII(data.Dataset):
         self.height      = 368
         self.is_train    = is_train
         self.sigma       = sigma
-        self.parts_num   = 16
         self.stride      = stride
 
         self.videosFolders = {}

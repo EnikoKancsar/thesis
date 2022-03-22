@@ -42,10 +42,8 @@ class Trainer(object):
 
         cudnn.benchmark   = True  # good when input sizes do not vary
 
-        if self.dataset   ==  "LSP":
-            self.numClasses  = 14
-        elif self.dataset == "MPII":
-            self.numClasses  = 16
+        if self.dataset == "MPII":
+            self.numClasses = CONF.get("MPII", "NUMBER_OF_CLASSES")
 
         self.train_loader, self.val_loader = getDataloader(
             self.dataset, self.sigma, self.stride, self.workers,

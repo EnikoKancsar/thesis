@@ -18,7 +18,7 @@ class Unipose(nn.Module):
 
         self.backbone = ResNet101(output_stride, BatchNorm)
         self.wasp = WASP(output_stride, BatchNorm)
-        self.decoder = Decoder(num_classes, BatchNorm)
+        self.decoder = Decoder(self.num_classes, BatchNorm)
         if freeze_bn:
             # If you're fine-tuning to minimize training,
             # it's typically best to keep batch normalization frozen
@@ -31,10 +31,6 @@ class Unipose(nn.Module):
         if self.stride != 8:
             x = interpolate(x, size=(input.size()[2:]), mode='bilinear', align_corners=True)
 
-        # If you are extracting bounding boxes as well
-        # return x[:,0:self.num_classes+1,:,:], x[:,self.num_classes+1:,:,:]
-    
-        # If you are only extracting keypoints
         return x
 
     def freeze_bn(self):
