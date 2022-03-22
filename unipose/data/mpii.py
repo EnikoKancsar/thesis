@@ -59,7 +59,7 @@ def crop(img, points, center, scale, resolution):
 
 
 class MPII(data.Dataset):
-    def __init__(self, root_dir, sigma, is_train, stride=8
+    def __init__(self, sigma, is_train, stride=8
                 # ,transform=None
                 ):
         self.width       = 368

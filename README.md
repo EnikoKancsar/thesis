@@ -114,10 +114,6 @@ Install from the given requirements file.
     * default=None
 - `--dataset`
     * choices=['LSP', 'MPII'], default='LSP'
-- `--train_dir`
-    * default='/PATH/TO/TRAIN'
-- `--val_dir`
-    * default='/PATH/TO/LSP/VAL'
 - `--model_name` (default=None)
     * Only used as a filename to save the torch model.
 Added:

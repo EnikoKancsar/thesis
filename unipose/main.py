@@ -23,8 +23,6 @@ from unipose.utils import printAccuracies
 class Trainer(object):
     def __init__(self, args):
         self.args         = args
-        self.train_dir    = args.train_dir
-        self.val_dir      = args.val_dir
         self.dataset      = args.dataset
 
         self.workers      = 1
@@ -45,8 +43,8 @@ class Trainer(object):
             self.numClasses  = 16
 
         self.train_loader, self.val_loader = getDataloader(
-            self.dataset, self.train_dir, self.val_dir, self.sigma,
-            self.stride, self.workers, self.batch_size)
+            self.dataset, self.sigma, self.stride, self.workers,
+            self.batch_size)
 
         model = Unipose(num_classes=self.numClasses, output_stride=16,
                         freeze_bn=False, stride=self.stride)
@@ -249,10 +247,8 @@ parser.add_argument('--pretrained', default=None, type=str, help="""
 If you wish to use pretrained weights, specify their path with this option
 to be loaded with torch.load().
 """)
-parser.add_argument('--dataset', default='LSP', choices=['LSP', 'MPII'], type=str, help='')
-parser.add_argument('--train_dir', default='/PATH/TO/TRAIN', type=str, help='')
-parser.add_argument('--val_dir', default='/PATH/TO/VAL', type=str, help='')
-parser.add_argument('--test_dir', default=None, type=str, help='')
+parser.add_argument('--dataset', default='LSP', choices=['LSP', 'MPII'],
+                    type=str, help='')
 parser.add_argument('--model_name', default=None, type=str, help="""
 Used as a filename to save the best performing model.
 """)
@@ -261,15 +257,6 @@ If True/1, the model will do testing instead of training.
 """)
 
 args = parser.parse_args()
-
-if args.dataset == 'LSP':
-    args.train_dir  = '/PATH/TO/LSP/TRAIN'
-    args.val_dir    = '/PATH/TO/LSP/VAL'
-    args.pretrained = '/PATH/TO/WEIGHTS'
-elif args.dataset == 'MPII':
-    args.train_dir  = '/PATH/TO/MPIII/TRAIN'
-    args.val_dir    = '/PATH/TO/MPIII/VAL'
-    args.test_dir   = '/PATH/TO/MPIII/TEST'
 
 trainer = Trainer(args)
 
