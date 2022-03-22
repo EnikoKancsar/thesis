@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-import unipose.transforms as transforms
+from unipose import transforms
 from unipose.utils import gaussian_kernel
 
 
