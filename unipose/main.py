@@ -100,7 +100,7 @@ class Trainer(object):
 
         for i, (input, heatmap, centermap, img_path) in enumerate(tbar):
             learning_rate = adjust_learning_rate(
-                self.optimizer, self.iters, self.lr, policy='step',
+                self.optimizer, self.iters, self.learning_rate, policy='step',
                 gamma=self.gamma, step_size=self.step_size)
 
             input_var = input.cuda()
