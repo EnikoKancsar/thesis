@@ -1,9 +1,9 @@
 from torch import nn
 from torch.nn.functional import interpolate
 
-from unipose.model.wasp import WASP
-from unipose.model.decoder import Decoder
-from unipose.model.resnet import ResNet101
+from thesis.unipose.model.wasp import WASP
+from thesis.unipose.model.decoder import Decoder
+from thesis.unipose.model.resnet import ResNet101
 
 
 class Unipose(nn.Module):

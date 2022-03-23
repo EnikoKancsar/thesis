@@ -1,6 +1,7 @@
 # -*-coding:UTF-8-*-
 import argparse
 import configparser
+import sys
 
 import cv2  # image analysis
 import numpy as np
@@ -11,41 +12,47 @@ from torch.nn.functional import interpolate
 import torch.optim
 from tqdm import tqdm  # Progress Bar Creator
 
-from unipose.evaluate import accuracy
-from unipose.model.unipose import Unipose
-from unipose.utils import adjust_learning_rate
-from unipose.utils import draw_paint
-from unipose.utils import get_model_summary
-from unipose.utils import getDataloader
-from unipose.utils import get_kpts
-from unipose.utils import printAccuracies
+sys.path.append("..")
+from thesis.unipose.evaluate import accuracy
+from thesis.unipose.model.unipose import Unipose
+from thesis.unipose.utils import adjust_learning_rate
+from thesis.unipose.utils import draw_paint
+from thesis.unipose.utils import get_model_summary
+from thesis.unipose.utils import getDataloader
+from thesis.unipose.utils import get_kpts
+from thesis.unipose.utils import printAccuracies
 
 
 CONF = configparser.ConfigParser()
-CONF.read('./conf.ini')
+CONF.read('../thesis/conf.ini')
 
 
 class Trainer(object):
     def __init__(self, args):
         self.args         = args
         self.dataset      = args.dataset
+        # CONF.set('HYPERPARAMETERS', 'DATASET', self.dataset)
 
-        self.workers      = 1
-        self.weight_decay = 0.0005
-        self.momentum     = 0.9
-        self.batch_size   = 8
-        self.lr           = 0.0001
-        self.gamma        = 0.333
-        self.step_size    = 13275
-        self.sigma        = 3  # for sigma-tuning of gaussian kernel
-        self.stride       = 8
+        # with open('./conf.ini', 'w') as conf_file:
+        #     CONF.write(conf_file)
+
+        self.workers       = CONF.getint('HYPERPARAMETERS', 'WORKERS')
+        self.weight_decay  = CONF.getfloat('HYPERPARAMETERS', 'WEIGHT_DECAY')
+        self.momentum      = CONF.getfloat('HYPERPARAMETERS', 'MOMENTUM')
+        self.batch_size    = CONF.getint('HYPERPARAMETERS', 'BATCH_SIZE')
+        self.learning_rate = CONF.getfloat('HYPERPARAMETERS', 'LEARNING_RATE')
+        self.gamma         = CONF.getfloat('HYPERPARAMETERS', 'GAMMA')
+        self.step_size     = CONF.getfloat('HYPERPARAMETERS', 'STEP_SIZE')
+        # for sigma-tuning of gaussian kernel
+        self.sigma         = CONF.getint('HYPERPARAMETERS', 'SIGMA')
+        self.stride        = CONF.getint('HYPERPARAMETERS', 'STRIDE')
 
         cudnn.benchmark   = True  # good when input sizes do not vary
 
         if self.dataset == "MPII":
-            self.numClasses = CONF.get("MPII", "NUMBER_OF_CLASSES")
+            self.numClasses = CONF.getint("MPII", "NUMBER_OF_CLASSES")
 
-        self.train_loader, self.val_loader = getDataloader(
+        self.train_loader, self.val_loader, self.test_loader = getDataloader(
             self.dataset, self.sigma, self.stride, self.workers,
             self.batch_size)
 
@@ -56,7 +63,8 @@ class Trainer(object):
 
         self.criterion  = nn.MSELoss().cuda()
 
-        self.optimizer  = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        self.optimizer  = torch.optim.Adam(self.model.parameters(),
+                                           lr=self.learning_rate)
 
         self.best_model = 12345678.9
 
