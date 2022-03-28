@@ -54,7 +54,12 @@ Original:
         * .objpos - rough human position in the image
         * .annopoints.point - person-centric body joint annotations
             * .x, .y - coordinates of a joint
-            * id - joint id (0 - r ankle, 1 - r knee, 2 - r hip, 3 - l hip, 4 - l knee, 5 - l ankle, 6 - pelvis, 7 - thorax, 8 - upper neck, 9 - head top, 10 - r wrist, 11 - r elbow, 12 - r shoulder, 13 - l shoulder, 14 - l elbow, 15 - l wrist)
+            * id - joint id 
+                * 0 - r ankle, 1 - r knee, 2 - r hip
+                * 3 - l hip, 4 - l knee, 5 - l ankle
+                * 6 - pelvis, 7 - thorax, 8 - upper neck, 9 - head top
+                * 10 - r wrist, 11 - r elbow, 12 - r shoulder
+                * 13 - l shoulder, 14 - l elbow, 15 - l wrist
             * is_visible - joint visibility
     * .vidx - video index in video_list
     * .frame_sec - image position in video, in seconds
@@ -64,32 +69,53 @@ Original:
     * act_name - activity name
     * cat_name - category name
     * act_id - activity id
-* vid
+* video_list(videoidx) - specifies video id as is provided by YouTube, https://www.youtube.com/watch?v=video_list(videoidx)
 
 After conversion:
 ```
-{
+[
+    'image_name': str,
+    'single_person': [],
     'act': {
-        'act_id': -1,
-        'act_name': [],
-        'cat_name': []
+        'act_id': str,
+        'act_name': str,
+        'cat_name': str,
     },
-    'annolist': {
-        'annorect': [
-            {
-                'objpos': {'x': 424, 'y': 382},
-                'scale': 2.563847109326139
-            },  
-            {
-                'objpos': {'x': 615, 'y': 426},
-                'scale': 1.8672246785001532
+    'list_of_people': [
+        {
+            'scale': float,
+            'objpos': {
+                'x': int,
+                'y': int
+            },
+            'head_rectangle': {
+                'x1': int,
+                'y1': int,
+                'x2': int,
+                'y2': int
+            },
+            'joints': {
+                "0": {"x": -1, "y": -1, "is_visible": -1},
+                "1": {"x": -1, "y": -1, "is_visible": -1},
+                "2": {"x": -1, "y": -1, "is_visible": -1},
+                "3": {"x": -1, "y": -1, "is_visible": -1},
+                "4": {"x": -1, "y": -1, "is_visible": -1},
+                "5": {"x": -1, "y": -1, "is_visible": -1},
+                "6": {"x": -1, "y": -1, "is_visible": -1},
+                "7": {"x": -1, "y": -1, "is_visible": -1},
+                "8": {"x": -1, "y": -1, "is_visible": -1},
+                "9": {"x": -1, "y": -1, "is_visible": -1},
+                "10": {"x": -1, "y": -1, "is_visible": -1},
+                "11": {"x": -1, "y": -1, "is_visible": -1},
+                "12": {"x": -1, "y": -1, "is_visible": -1},
+                "13": {"x": -1, "y": -1, "is_visible": -1},
+                "14": {"x": -1, "y": -1, "is_visible": -1},
+                "15": {"x": -1, "y": -1, "is_visible": -1}
             }
-        ],
-        'frame_sec': [],
-        'image': {'name': '001386214.jpg'},
-        'vididx': []
-    },
-    'single_person': [1, 2]}
+        },
+        ...
+    ]
+]
 ```
 
 # Command line usage

@@ -1,3 +1,4 @@
+import torch
 from torch import nn
 from torch.nn.functional import interpolate
 
@@ -39,3 +40,11 @@ class Unipose(nn.Module):
                 m.eval()
             # elif isinstance(m, SynchronizedBatchNorm2d):
             #     m.eval()
+
+
+if __name__ == "__main__":
+    model = WASP(output_stride=16)
+    model.eval()
+    input = torch.rand(1, 3, 513, 513)
+    output = model(input)
+    print(output.size())

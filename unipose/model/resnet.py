@@ -166,3 +166,11 @@ def ResNet101(output_stride, BatchNorm, pretrained=True):
     # model = ResNet(Bottleneck, [3, 4, 6, 3], output_stride, BatchNorm, pretrained=pretrained)
     model = ResNet(Bottleneck, [3, 4, 23, 3], output_stride, BatchNorm, pretrained=pretrained)
     return model
+
+if __name__ == "__main__":
+    import torch
+    model = ResNet101(BatchNorm=nn.BatchNorm2d, pretrained=True, output_stride=8)
+    input = torch.rand(1, 3, 512, 512)
+    output, low_level_feat = model(input)
+    print(output.size())
+    print(low_level_feat.size())

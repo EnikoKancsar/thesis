@@ -2,6 +2,7 @@
 
 import configparser
 import json
+import os
 import shutil
 
 from numpy import ndarray
@@ -10,7 +11,7 @@ from scipy import io
 
 
 CONF = configparser.ConfigParser()
-CONF.read('./conf.ini')
+CONF.read("./conf.ini")
 
 
 MPII_MAT = io.loadmat(CONF.get("MPII", "ANNOTATIONS_MAT"), struct_as_record=False)["RELEASE"]
@@ -44,55 +45,129 @@ def generate_dataset_obj(obj):
     return ret
 
 MPII_DICT = generate_dataset_obj(MPII_MAT)
-
 MPII_LIST_TRAIN, MPII_LIST_VAL = [], []
 
-for index, value in enumerate(MPII_DICT['img_train']):
-    dest_dir, annotation_list = (
+for index, value in enumerate(MPII_DICT["img_train"]):
+    dest_dir, dest_list = (
         (CONF.get("MPII", "DIR_IMAGES_TRAIN"), MPII_LIST_TRAIN) 
         if value == 1
         else (CONF.get("MPII", "DIR_IMAGES_VAL"), MPII_LIST_VAL)
     )
-    file_name = MPII_DICT['annolist'][index]['image']['name']
+    file_name = MPII_DICT["annolist"][index]["image"]["name"]
+    file_path = os.path.join(CONF.get("MPII", "DIR_IMAGES"), file_name)
     try:
-        shutil.copy(CONF.get("MPII", "DIR_IMAGES") + '\\' + file_name, dest_dir)
-    except FileNotFoundError as err:    
+        shutil.copy(file_path, dest_dir)
+    except FileNotFoundError as err:
+        print("annotation without file: ", file_name)
+        print("index: ", index, "\n")
         continue
-    annotation_list.append({
-        'annolist': MPII_DICT['annolist'][index],
-        'single_person': MPII_DICT['single_person'][index],
-        'act': MPII_DICT['act'][index]
+
+    annotations_of_image = []
+        
+    for person in MPII_DICT["annolist"][index]["annorect"]:
+        if "objpos" not in person:
+            person["objpos"] = {}
+        if person["objpos"] == []:
+            person["objpos"] = {}
+
+        annotation_of_person = {
+            "scale": person.get("scale"),
+            "objpos": {
+                "x": person["objpos"].get("x"),
+                "y": person["objpos"].get("y")
+            },
+            "head_rectangle": {
+                "x1": person.get("x1"),
+                "y1": person.get("y1"),
+                "x2": person.get("x2"),
+                "y2": person.get("y2")
+            },
+            "joints": {
+                "0": {"x": -1, "y": -1, "is_visible": -1},
+                "1": {"x": -1, "y": -1, "is_visible": -1},
+                "2": {"x": -1, "y": -1, "is_visible": -1},
+                "3": {"x": -1, "y": -1, "is_visible": -1},
+                "4": {"x": -1, "y": -1, "is_visible": -1},
+                "5": {"x": -1, "y": -1, "is_visible": -1},
+                "6": {"x": -1, "y": -1, "is_visible": -1},
+                "7": {"x": -1, "y": -1, "is_visible": -1},
+                "8": {"x": -1, "y": -1, "is_visible": -1},
+                "9": {"x": -1, "y": -1, "is_visible": -1},
+                "10": {"x": -1, "y": -1, "is_visible": -1},
+                "11": {"x": -1, "y": -1, "is_visible": -1},
+                "12": {"x": -1, "y": -1, "is_visible": -1},
+                "13": {"x": -1, "y": -1, "is_visible": -1},
+                "14": {"x": -1, "y": -1, "is_visible": -1},
+                "15": {"x": -1, "y": -1, "is_visible": -1}
+            }
+        }
+
+        if "annopoints" not in person:
+            person["annopoints"] = {}
+        if person["annopoints"] == []:
+            person["annopoints"] = {}
+        if "point" not in person["annopoints"]:
+            person["annopoints"]["point"] = []
+        for joint in person["annopoints"]["point"]:
+            annotation_of_person["joints"][str(joint["id"])] = {
+                "x": joint.get("x", -1),
+                "y": joint.get("y"),
+                "is_visible": (joint.get("is_visible")
+                               if joint.get("is_visible") != []
+                               else -1)
+            }
+
+        annotations_of_image.append(annotation_of_person)
+    
+    
+    if len(MPII_DICT["annolist"][index]["annorect"]) == 0:
+        annotations_of_image = [{
+            "scale": -1,
+            "objpos": {
+                "x": -1,
+                "y": -1
+            },
+            "head_rectangle": {
+                "x1": -1,
+                "y1": -1,
+                "x2": -1,
+                "y2": -1
+            },
+            "joints": {
+                "0": {"x": -1, "y": -1, "is_visible": -1},
+                "1": {"x": -1, "y": -1, "is_visible": -1},
+                "2": {"x": -1, "y": -1, "is_visible": -1},
+                "3": {"x": -1, "y": -1, "is_visible": -1},
+                "4": {"x": -1, "y": -1, "is_visible": -1},
+                "5": {"x": -1, "y": -1, "is_visible": -1},
+                "6": {"x": -1, "y": -1, "is_visible": -1},
+                "7": {"x": -1, "y": -1, "is_visible": -1},
+                "8": {"x": -1, "y": -1, "is_visible": -1},
+                "9": {"x": -1, "y": -1, "is_visible": -1},
+                "10": {"x": -1, "y": -1, "is_visible": -1},
+                "11": {"x": -1, "y": -1, "is_visible": -1},
+                "12": {"x": -1, "y": -1, "is_visible": -1},
+                "13": {"x": -1, "y": -1, "is_visible": -1},
+                "14": {"x": -1, "y": -1, "is_visible": -1},
+                "15": {"x": -1, "y": -1, "is_visible": -1}
+            }
+        }]
+    
+    dest_list.append({
+        "image_name": file_name,
+        "single_person": MPII_DICT["single_person"][index],
+        "act": MPII_DICT["act"][index],
+        "list_of_people": annotations_of_image
     })
 
-
 try:
-    with open(CONF.get("MPII", "ANNOTATIONS_TRAIN"), 'w') as file:
+    with open(CONF.get("MPII", "ANNOTATIONS_TRAIN"), "w") as file:
         file.write(json.dumps(MPII_LIST_TRAIN))
 except FileNotFoundError as err:
-    print('Path to train annotations file not specified. Please edit your config file.')
+    print("Path to train annotations file not specified. Please edit your config file.")
 
 try:
-    with open(CONF.get("MPII", "ANNOTATIONS_VAL"), 'w') as file:
+    with open(CONF.get("MPII", "ANNOTATIONS_VAL"), "w") as file:
         file.write(json.dumps(MPII_LIST_VAL))
 except FileNotFoundError as err:
-    print('Path to val annotations file not specified. Please edit your config file.')
-
-
-"""How to access and use these files
-
-```
-loaded = None
-with open(conf.MPII_FILE_ANNOTATIONS_JSON_VAL, 'r') as file:
-    loaded = json.load(file)
-print(loaded[1234])
-```
-{'act': {'act_id': -1, 'act_name': [], 'cat_name': []},
- 'annolist': {'annorect': [{'objpos': {'x': 424, 'y': 382},
-                            'scale': 2.563847109326139},  
-                           {'objpos': {'x': 615, 'y': 426},
-                            'scale': 1.8672246785001532}],
-              'frame_sec': [],
-              'image': {'name': '001386214.jpg'},
-              'vididx': []},
- 'single_person': [1, 2]}
-"""
+    print("Path to val annotations file not specified. Please edit your config file.")

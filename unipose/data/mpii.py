@@ -45,7 +45,7 @@ class MPII(data.Dataset):
         self.full_img_List = {}
         self.numPeople     = []
 
-        self.labels_dir = CONF.get("MPII", "DIR_IMAGES")
+        self.labels_dir = CONF.get("MPII", "DIR_LABELS")
         self.images_dir, anno_file = (
             (CONF.get("MPII", "DIR_IMAGES_TRAIN"),
              CONF.get("MPII", "ANNOTATIONS_TRAIN"))
@@ -59,18 +59,23 @@ class MPII(data.Dataset):
 
     def __getitem__(self, index):
         scale_factor = 0.25
-
-        variable = self.annotations[index]
+        annotation = self.annotations[index]
         
-        while not os.path.isfile(self.labels_dir + variable['img_paths'][:-4]+'.png'):
-            index = index - 1
-            variable = self.annotations[index]
+        img_path = os.path.join(self.images_dir, annotation['image_name'])
 
-        img_path  = self.images_dir + variable['img_paths']
+        joints = annotation['list_of_people'][0]['joints']
+        points = []
+        for joint_id, joint_value in joints.items():
+            point = [joint_value["x"], joint_value["y"], joint_value["is_visible"]]
+            if point[0]==-1.0:
+                point[2] = 0.00
+            points.append(point)
+        points = torch.Tensor(points)
 
-        points = torch.Tensor(variable['joint_self'])
-        center = torch.Tensor(variable['objpos'])
-        scale  = variable['scale_provided']
+        objpos = annotation['list_of_people'][0]['objpos']
+        center = torch.Tensor([objpos['x'], objpos['y']])
+        
+        scale  = annotation['list_of_people'][0]['scale']
 
         if center[0] != -1:
             center[1] = center[1] + 15*scale
@@ -85,7 +90,7 @@ class MPII(data.Dataset):
         if img.shape[0] != 368 or img.shape[1] != 368:
             kpt[:,0] = kpt[:,0] * (368/img.shape[1])
             kpt[:,1] = kpt[:,1] * (368/img.shape[0])
-            img = cv2.resize(img,(368,368))
+            img = cv2.resize(img, (368,368))
         height, width, _ = img.shape
 
         heatmap = np.zeros(

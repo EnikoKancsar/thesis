@@ -89,7 +89,7 @@ class Trainer(object):
         self.bestPCKh = 0
 
         # Print model summary and metrics
-        dump_input = torch.rand([1, 3, 368, 368])
+        dump_input = torch.rand([1, 3, 368, 368]).cuda()
         print(get_model_summary(self.model, dump_input))
 
     def training(self, epoch):
@@ -253,30 +253,31 @@ class Trainer(object):
                 im_heat = cv2.addWeighted(im, 0.6, heatmap, 0.4, 0)
                 cv2.imwrite('samples/heat/unipose' + str(i) + '.png', im_heat)
 
+if __name__ == "__main__":
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--pretrained', default=None, type=str, help="""
-'/PATH/TO/WEIGHTS'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--pretrained', default=None, type=str, help="""
+    '/PATH/TO/WEIGHTS'
 
-If you wish to use pretrained weights, specify their path with this option
-to be loaded with torch.load().
-""")
-parser.add_argument('--dataset', default='MPII', choices=['MPII'], type=str)
-parser.add_argument(
-    '--model_name', default=None, type=str,
-    help="Used as a filename to save the best performing model.")
-parser.add_argument(
-    '--test', default=False, choices=[False, True], type=bool,
-    help="If True, the model will do testing instead of training.")
+    If you wish to use pretrained weights, specify their path with this option
+    to be loaded with torch.load().
+    """)
+    parser.add_argument('--dataset', default='MPII', choices=['MPII'], type=str)
+    parser.add_argument(
+        '--model_name', default=None, type=str,
+        help="Used as a filename to save the best performing model.")
+    parser.add_argument(
+        '--test', default=False, choices=[False, True], type=bool,
+        help="If True, the model will do testing instead of training.")
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-trainer = Trainer(args)
+    trainer = Trainer(args)
 
-if args.test:
-    trainer.test(0)
-else:
-    epochs = 100
-    for epoch in range(epochs):
-        trainer.training(epoch)
-        trainer.validation(epoch)
+    if args.test:
+        trainer.test(0)
+    else:
+        epochs = 100
+        for epoch in range(epochs):
+            trainer.training(epoch)
+            trainer.validation(epoch)
