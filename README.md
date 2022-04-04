@@ -184,13 +184,14 @@ If the conda environment is not set already, the activate command should work co
 
 [How to freeze BN layers while training](https://discuss.pytorch.org/t/how-to-freeze-bn-layers-while-training-the-rest-of-network-mean-and-var-wont-freeze/89736/11)
 
+## tqdm causes error in conda
+
+The tqdm package is only installable via pip (when I tried).
+Using it with conda, and creating a completely independent, new conda environment can be doomed to fail, the only possible resolution being deleting conda completely and reinstalling it.
+
 # Notes
 
 ## Removing `dataset`
 
 This parameter is actually not used within `Unipose()`.
 Except one place in the `Decoder()` where it checks if it's NTID which I don't plan to use.
-
-## Removing `if __name__ == “main”:`
-
-`if __name__ == “main”:` is used to execute some code only if the file was run directly, and not imported. ([Source](https://www.geeksforgeeks.org/what-does-the-if-__name__-__main__-do/))
