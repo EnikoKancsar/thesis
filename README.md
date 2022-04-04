@@ -76,7 +76,7 @@ After conversion:
 [
     'image_name': str,
     'single_person': [],
-    'act': {
+    'activity': {
         'act_id': str,
         'act_name': str,
         'cat_name': str,
