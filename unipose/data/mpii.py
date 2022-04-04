@@ -66,7 +66,9 @@ class MPII(data.Dataset):
         joints = annotation['list_of_people'][0]['joints']
         points = []
         for joint_id, joint_value in joints.items():
-            point = [joint_value["x"], joint_value["y"], joint_value["is_visible"]]
+            point = [
+                joint_value["x"], joint_value["y"], joint_value["is_visible"]
+            ]
             if point[0]==-1.0:
                 point[2] = 0.00
             points.append(point)
