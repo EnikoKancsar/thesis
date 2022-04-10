@@ -20,7 +20,8 @@ try:
     path_annotations = CONF.get("MPII", "ANNOTATIONS_MAT")
     MPII_MAT = io.loadmat(path_annotations, struct_as_record=False)["RELEASE"]
 except FileNotFoundError as err:
-    print("Path to annotations file not specified. "
+    print(err)
+    print("Annotations .mat file not found. "
           "Please edit your conf.ini file.")
     exit()
 
