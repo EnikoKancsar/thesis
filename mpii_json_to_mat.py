@@ -16,8 +16,14 @@ from scipy import io
 CONF = configparser.ConfigParser()
 CONF.read("./conf.ini")
 
+try:
+    path_annotations_mat = CONF.get("MPII", "ANNOTATIONS_MAT")
+except FileNotFoundError as err:
+    print("Path to annotations file not specified. "
+          "Please edit your conf.ini file.")
+    exit()
 
-MPII_MAT = io.loadmat(CONF.get("MPII", "ANNOTATIONS_MAT"), struct_as_record=False)["RELEASE"]
+MPII_MAT = io.loadmat(path_annotations_mat, struct_as_record=False)["RELEASE"]
 
 MUST_BE_LIST = ["annolist", "annorect", "point", "img_train", "single_person",
                 "act", "video_list"]
