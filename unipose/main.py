@@ -83,7 +83,7 @@ class Trainer(object):
 
             state_dict.update(model_dict)
             self.model.load_state_dict(state_dict)
-            
+
         self.isBest   = 0
         self.bestPCK  = 0
         self.bestPCKh = 0
@@ -95,7 +95,7 @@ class Trainer(object):
     def training(self, epoch):
         train_loss = 0.0
         self.model.train()
-        print("Epoch " + str(epoch) + ':') 
+        print("Epoch " + str(epoch) + ':')
         tbar = tqdm(self.train_loader)
 
         for i, (input, heatmap, centermap, img_path) in enumerate(tbar):
@@ -131,7 +131,7 @@ class Trainer(object):
         self.model.eval()
         tbar = tqdm(self.val_loader, desc='\r')
         val_loss = 0.0
-        
+
         AP    = np.zeros(self.numClasses+1)
         PCK   = np.zeros(self.numClasses+1)
         PCKh  = np.zeros(self.numClasses+1)
@@ -175,9 +175,9 @@ class Trainer(object):
             mAP   =   AP[1:].sum()/(self.numClasses)
             mPCK  =  PCK[1:].sum()/(self.numClasses)
             mPCKh = PCKh[1:].sum()/(self.numClasses)
-	
-        printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, self.dataset)
-            
+
+        printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, self.dataset
+
         PCKhAvg = PCKh.sum()/(self.numClasses+1)
         PCKAvg  =  PCK.sum()/(self.numClasses+1)
 
@@ -204,7 +204,7 @@ class Trainer(object):
 
     def test(self, epoch):
         self.model.eval()
-        print("Testing") 
+        print("Testing")
 
         for idx in range(1):
             print(idx,"/",2000)
@@ -264,7 +264,7 @@ if __name__ == "__main__":
     """)
     parser.add_argument('--dataset', default='MPII', choices=['MPII'], type=str)
     parser.add_argument(
-        '--model_name', default=None, type=str,
+        '--model_name', default='unipose', type=str,
         help="Used as a filename to save the best performing model.")
     parser.add_argument(
         '--test', default=False, choices=[False, True], type=bool,

@@ -140,7 +140,7 @@ Install from the given requirements file.
     * default=None
 - `--dataset`
     * choices=['MPII'], default='MPII'
-- `--model_name` (default=None)
+- `--model_name` (default='unipose')
     * Only used as a filename to save the torch model.
 Added:
 - `--test`
