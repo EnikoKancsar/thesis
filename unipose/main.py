@@ -33,8 +33,8 @@ class Trainer(object):
         self.dataset      = args.dataset
         # CONF.set('HYPERPARAMETERS', 'DATASET', self.dataset)
 
-        # with open('./conf.ini', 'w') as conf_file:
-        #     CONF.write(conf_file)
+        with open('./conf.ini', 'w') as conf_file:
+            CONF.write(conf_file)
 
         self.workers       = CONF.getint('HYPERPARAMETERS', 'WORKERS')
         self.weight_decay  = CONF.getfloat('HYPERPARAMETERS', 'WEIGHT_DECAY')
@@ -176,7 +176,7 @@ class Trainer(object):
             mPCK  =  PCK[1:].sum()/(self.numClasses)
             mPCKh = PCKh[1:].sum()/(self.numClasses)
 
-        printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, self.dataset
+        printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, self.dataset)
 
         PCKhAvg = PCKh.sum()/(self.numClasses+1)
         PCKAvg  =  PCK.sum()/(self.numClasses+1)
