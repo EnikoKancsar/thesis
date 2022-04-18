@@ -45,7 +45,6 @@ class MPII(data.Dataset):
         self.full_img_List = {}
         self.numPeople     = []
 
-        self.labels_dir = CONF.get("MPII", "DIR_LABELS")
         self.images_dir, anno_file = (
             (CONF.get("MPII", "DIR_IMAGES_TRAIN"),
              CONF.get("MPII", "ANNOTATIONS_TRAIN"))
