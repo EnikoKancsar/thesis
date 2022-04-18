@@ -277,7 +277,7 @@ if __name__ == "__main__":
     if args.test:
         trainer.test(0)
     else:
-        epochs = 100
+        epochs = CONF.getint('HYPERPARAMETERS', 'EPOCHS')
         for epoch in range(epochs):
             trainer.training(epoch)
             trainer.validation(epoch)
