@@ -63,19 +63,11 @@ def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
                 flops = (prod(LongTensor(list(output.size()))) \
                          * input[0].size(1)).item()
 
-            # from pprint import pprint
-            # print('type(input): ', type(input))  # tuple
-            # print('type(input[0]): ', type(input[0]))  # torch.Tensor
-            # print('type(output): ', type(output))  # torch.Tensor
-            # print('type(output[0]): ', type(output[0]))  # torch.Tensor
-            # if isinstance(output, tuple):
-            #     print('type(output): ', type(output))  # tuple
-            #     print('type(output[0]): ', type(output[0]))  # torch.Tensor
             if isinstance(input[0], list):
                 input = input[0]
             if isinstance(output, (list, tuple)):
                 output = output[0]
-            
+
             summary.append(
                 ModuleDetails(
                     name=layer_name,
