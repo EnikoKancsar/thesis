@@ -90,6 +90,10 @@ class Trainer(object):
 
         # Print model summary and metrics
         dump_input = torch.rand([1, 3, 368, 368]).cuda()
+
+        with open('./output.txt', 'w') as output_file:
+            output_file.write(get_model_summary(self.model, dump_input))
+
         print(get_model_summary(self.model, dump_input))
 
     def training(self, epoch):

@@ -129,7 +129,7 @@ def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
         flops_sum/(1024**3)) + os.linesep + '-' * space_len * 5 + os.linesep
     details += "Number of Layers" + os.linesep
     for layer in layer_instances:
-        details += "{} : {} layers   ".format(layer, layer_instances[layer])
+        details += "{} : {} layers\n".format(layer, layer_instances[layer])
 
     return details
 
