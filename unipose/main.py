@@ -133,8 +133,8 @@ class Trainer(object):
 
         with open('./output.txt', 'a') as output_file:
             output_file.write(f'\nEpoch {epoch}:\nTrain loss:')
-            output_file.write(str(train_loss))
-            output_file.write(str(train_loss / (10001*self.batch_size)))
+            output_file.write('\n' + str(train_loss))
+            output_file.write('\n' + str(train_loss / (10001*self.batch_size)))
         
         torch.save(self.model.state_dict(), './model_state_dict.pt')
 
@@ -215,8 +215,8 @@ class Trainer(object):
 
         with open('./output.txt', 'a') as output_file:
             output_file.write('Val loss:')
-            output_file.write(str(val_loss))
-            output_file.write(str(val_loss / (10001*self.batch_size)))
+            output_file.write('\n' + str(val_loss))
+            output_file.write('\n' + str(val_loss / (10001*self.batch_size)))
 
     def test(self, epoch):
         self.model.eval()
