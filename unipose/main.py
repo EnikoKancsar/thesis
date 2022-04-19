@@ -70,8 +70,9 @@ class Trainer(object):
 
         self.iters      = 0
 
-        if self.args.pretrained is not None:
-            checkpoint = torch.load(self.args.pretrained)
+        if self.args.pretrained is True:
+            path_to_weights = CONF.get('PRETRAINED', 'PATH_TO_WEIGHTS')
+            checkpoint = torch.load(path_to_weights)
             p = checkpoint['state_dict']
 
             state_dict = self.model.state_dict()
@@ -272,11 +273,10 @@ class Trainer(object):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--pretrained', default=None, type=str, help="""
-    '/PATH/TO/WEIGHTS'
-
-    If you wish to use pretrained weights, specify their path with this option
-    to be loaded with torch.load().
+    parser.add_argument('--pretrained', default=False, type=bool, help="""
+    If True, the pretrained weights will be loaded with torch.load()
+    from the conf.ini file PRETRAINED section PATH_TO_WEIGHTS value.
+    Specify the value to correctly use the argument.
     """)
     parser.add_argument('--dataset', default='MPII', choices=['MPII'], type=str)
     parser.add_argument(

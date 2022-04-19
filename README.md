@@ -135,9 +135,10 @@ Install from the given requirements file.
 ## Arguments
 
 - `--pretrained`
-    * If the model is pretrained, specify the path to the pretrained weights from where they can be loaded with torch.load()
-    * '/PATH/TO/WEIGHTS'
-    * default=None
+    * If True, the pretrained weights will be loaded with torch.load()
+    from the conf.ini file PRETRAINED section PATH_TO_WEIGHTS value.
+    Specify the value to correctly use the argument.
+    * default=False
 - `--dataset`
     * choices=['MPII'], default='MPII'
 - `--model_name` (default='unipose')
