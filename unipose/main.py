@@ -214,7 +214,7 @@ class Trainer(object):
         # "%2.2f%%": ??? typo???
 
         with open('./output.txt', 'a') as output_file:
-            output_file.write('Val loss:')
+            output_file.write('\nVal loss:')
             output_file.write('\n' + str(val_loss))
             output_file.write('\n' + str(val_loss / (10001*self.batch_size)))
 
