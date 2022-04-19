@@ -53,18 +53,18 @@ def get_max_preds(batch_heatmaps):
 	return preds, maxvals
 
 
-def accuracy(output, target, thr_PCK, thr_PCKh, dataset, hm_type='gaussian',
-			 threshold=0.5):
+def accuracy(output, target, threshold_PCK, threshold_PCKh, dataset,
+			 heatmap_type='gaussian', threshold=0.5):
 	idx  = list(range(output.shape[1]))
 	norm = 1.0
 
-	if hm_type == 'gaussian':
+	if heatmap_type == 'gaussian':
 		pred, _   = get_max_preds(output)
 		target, _ = get_max_preds(target)
 
-		h         = output.shape[2]
-		w         = output.shape[3]
-		norm      = np.ones((pred.shape[0], 2)) * np.array([h,w]) / 10
+		height    = output.shape[2]
+		width     = output.shape[3]
+		norm      = np.ones((pred.shape[0], 2)) * np.array([height, width]) / 10
 
 	dists = calc_dists(pred, target, norm)
 
@@ -97,7 +97,7 @@ def accuracy(output, target, thr_PCK, thr_PCKh, dataset, hm_type='gaussian',
 		headLength = np.linalg.norm(target[0,9,:] - target[0,10,:])
 
 	for i in range(len(idx)):
-		PCKh[i] = dist_acc(dists[idx[i]], thr_PCKh*headLength)
+		PCKh[i] = dist_acc(dists[idx[i]], threshold_PCKh*headLength)
 		if PCKh[i] >= 0:
 			avg_PCKh = avg_PCKh + PCKh[i]
 		else:
@@ -122,7 +122,7 @@ def accuracy(output, target, thr_PCK, thr_PCKh, dataset, hm_type='gaussian',
 		torso  = np.linalg.norm(target[0,7,0] - target[0,8,0])
 
 	for i in range(len(idx)):
-		PCK[i] = dist_acc(dists[idx[i]], thr_PCK*torso)
+		PCK[i] = dist_acc(dists[idx[i]], threshold_PCK*torso)
 
 		if PCK[i] >= 0:
 			avg_PCK = avg_PCK + PCK[i]
