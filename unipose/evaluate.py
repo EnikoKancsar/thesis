@@ -57,7 +57,7 @@ def accuracy(output, target, threshold_PCK, threshold_PCKh, dataset,
 			 heatmap_type='gaussian', threshold=0.5):
 	idx  = list(range(output.shape[1]))
 	norm = 1.0
-
+	print(output, '\n', target)
 	if heatmap_type == 'gaussian':
 		pred, _   = get_max_preds(output)
 		target, _ = get_max_preds(target)
@@ -74,7 +74,7 @@ def accuracy(output, target, threshold_PCK, threshold_PCKh, dataset,
 	visible = np.zeros((len(idx)))
 
 	for i in range(len(idx)):
-		acc[i] = dist_acc(dists[idx[i]])
+		acc[i] = dist_acc(dists[idx[i]], threshold)
 		if acc[i] >= 0:
 			avg_acc = avg_acc + acc[i]
 			cnt    += 1

@@ -133,8 +133,8 @@ class Trainer(object):
 
         with open('./output.txt', 'a') as output_file:
             output_file.write(f'\nEpoch {epoch}:\nTrain loss:')
-            output_file.write(train_loss)
-            output_file.write(train_loss / (10001*self.batch_size))
+            output_file.write(str(train_loss))
+            output_file.write(str(train_loss / (10001*self.batch_size)))
 
     def validation(self, epoch):
         self.model.eval()
@@ -169,7 +169,7 @@ class Trainer(object):
                 output=heat.detach().cpu().numpy(),
                 target=heatmap_var.detach().cpu().numpy(),
                 threshold_PCK=0.2, threshold_PCKh=0.5, dataset=self.dataset)
-
+            print(acc, ' ', acc_PCK, ' ', acc_PCKh, ' ', cnt, ' ', pred, ' ', visible)
             AP[0]   = (AP[0]  *i + acc[0])      / (i + 1)
             PCK[0]  = (PCK[0] *i + acc_PCK[0])  / (i + 1)
             PCKh[0] = (PCKh[0]*i + acc_PCKh[0]) / (i + 1)
@@ -213,8 +213,8 @@ class Trainer(object):
 
         with open('./output.txt', 'a') as output_file:
             output_file.write('Val loss:')
-            output_file.write(val_loss)
-            output_file.write(val_loss / (10001*self.batch_size))
+            output_file.write(str(val_loss))
+            output_file.write(str(val_loss / (10001*self.batch_size)))
 
     def test(self, epoch):
         self.model.eval()
