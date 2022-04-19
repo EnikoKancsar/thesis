@@ -73,12 +73,11 @@ class Trainer(object):
         if self.args.pretrained is True:
             path_to_weights = CONF.get('PRETRAINED', 'PATH_TO_WEIGHTS')
             checkpoint = torch.load(path_to_weights)
-            p = checkpoint['state_dict']
 
             state_dict = self.model.state_dict()
             model_dict = {}
 
-            for k,v in p.items():
+            for k,v in checkpoint.items():
                 if k in state_dict:
                     model_dict[k] = v
 
