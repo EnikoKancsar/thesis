@@ -136,7 +136,7 @@ class Trainer(object):
             output_file.write(str(train_loss))
             output_file.write(str(train_loss / (10001*self.batch_size)))
         
-        torch.save(self.model.state_dict(), './model_')
+        torch.save(self.model.state_dict(), './model_state_dict.pt')
 
     def validation(self, epoch):
         self.model.eval()
