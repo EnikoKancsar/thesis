@@ -26,13 +26,13 @@ class Unipose(nn.Module):
             self.freeze_bn()
 
     def forward(self, input):
-        x, low_level_feat = self.backbone(input)
-        x = self.wasp(x)
-        x = self.decoder(x, low_level_feat)
+        heat, low_level_feat = self.backbone(input)
+        heat = self.wasp(heat)
+        heat = self.decoder(heat, low_level_feat)
         if self.stride != 8:
-            x = interpolate(x, size=(input.size()[2:]), mode='bilinear', align_corners=True)
-
-        return x
+            heat = interpolate(heat, size=(input.size()[2:]), mode='bilinear',
+                               align_corners=True)
+        return heat
 
     def freeze_bn(self):
         for m in self.modules():
