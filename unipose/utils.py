@@ -240,33 +240,7 @@ def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
 
 
 def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
-    if dataset == "LSP":
-        print("\nmAP:   %.2f%%" % (mAP*100))
-        print("APs:     Void = %2.2f%%, Right Ankle = %2.2f%%,  Right Knee = %2.2f%%,   Right Hip = %2.2f%%,       Left Hip = %2.2f%%,"\
-            % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100))
-        print("    Left Knee = %2.2f%%,  Left Ankle = %2.2f%%, Right Wrist = %2.2f%%, Right Elbow = %2.2f%%, Right Shoulder = %2.2f%%,"\
-            % (AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100))
-        print("Left Shoulder = %2.2f%%,  Left Elbow = %2.2f%%,  Left Wrist = %2.2f%%,        Neck = %2.2f%%,       Head Top = %2.2f%%"\
-            % (AP[10]*100,AP[11]*100,AP[12]*100,AP[13]*100,AP[14]*100))
-
-
-        print("mPCK:  %.2f%%" % (mPCK*100))
-        print("PCKs:    Void = %2.2f%%, Right Ankle = %2.2f%%,  Right Knee = %2.2f%%,   Right Hip = %2.2f%%,       Left Hip = %2.2f%%,"\
-            % (PCK[0]*100,PCK[1]*100,PCK[2]*100,PCK[3]*100,PCK[4]*100))
-        print("    Left Knee = %2.2f%%,  Left Ankle = %2.2f%%, Right Wrist = %2.2f%%, Right Elbow = %2.2f%%, Right Shoulder = %2.2f%%,"\
-            % (PCK[5]*100,PCK[6]*100,PCK[7]*100,PCK[8]*100,PCK[9]*100))
-        print("Left Shoulder = %2.2f%%,  Left Elbow = %2.2f%%,  Left Wrist = %2.2f%%,        Neck = %2.2f%%,       Head Top = %2.2f%%"\
-            % (PCK[10]*100,PCK[11]*100,PCK[12]*100,PCK[13]*100,PCK[14]*100))
-
-        print("mPCKh: %.2f%%" % (mPCKh*100))
-        print("PCKhs:   Void = %2.2f%%, Right Ankle = %2.2f%%,  Right Knee = %2.2f%%,   Right Hip = %2.2f%%,       Left Hip = %2.2f%%,"\
-            % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100))
-        print("    Left Knee = %2.2f%%,  Left Ankle = %2.2f%%, Right Wrist = %2.2f%%, Right Elbow = %2.2f%%, Right Shoulder = %2.2f%%,"\
-            % (PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100))
-        print("Left Shoulder = %2.2f%%,  Left Elbow = %2.2f%%,  Left Wrist = %2.2f%%,        Neck = %2.2f%%,       Head Top = %2.2f%%"\
-            % (PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100))
-
-    elif dataset == "MPII":
+    if dataset == "MPII":
         print("\nmAP:   %.2f%%" % (mAP*100))
         print("APs:   %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
             % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100,AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100,PCKh[10]*100,\
@@ -279,5 +253,21 @@ def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
 
         print("mPCKh: %.2f%%" % (mPCKh*100))
         print("PCKhs: %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
+            % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100,PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100,\
+                PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100,PCKh[15]*100,PCKh[16]*100))
+
+        with open('./output.txt', 'a') as output_file:
+            output_file.write("\nmAP:   %.2f%%" % (mAP*100))
+            output_file.write("APs:   %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
+            % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100,AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100,PCKh[10]*100,\
+                AP[11]*100,AP[12]*100,AP[13]*100,AP[14]*100,AP[15]*100,AP[16]*100))
+
+            output_file.write("mPCK:  %.2f%%" % (mPCK*100))
+            output_file.write("PCKs:  %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
+            % (PCK[0]*100,PCK[1]*100,PCK[2]*100,PCK[3]*100,PCK[4]*100,PCK[5]*100,PCK[6]*100,PCK[7]*100,PCK[8]*100,PCK[9]*100,PCK[10]*100,\
+                PCK[11]*100,PCK[12]*100,PCK[13]*100,PCK[14]*100,PCK[15]*100,PCK[16]*100))
+
+            output_file.write("mPCKh: %.2f%%" % (mPCKh*100))
+            output_file.write("PCKhs: %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
             % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100,PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100,\
                 PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100,PCKh[15]*100,PCKh[16]*100))
