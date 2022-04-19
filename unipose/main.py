@@ -135,6 +135,8 @@ class Trainer(object):
             output_file.write(f'\nEpoch {epoch}:\nTrain loss:')
             output_file.write(str(train_loss))
             output_file.write(str(train_loss / (10001*self.batch_size)))
+        
+        torch.save(self.model.state_dict(), './model_')
 
     def validation(self, epoch):
         self.model.eval()
@@ -169,7 +171,7 @@ class Trainer(object):
                 output=heat.detach().cpu().numpy(),
                 target=heatmap_var.detach().cpu().numpy(),
                 threshold_PCK=0.2, threshold_PCKh=0.5, dataset=self.dataset)
-            print(acc, ' ', acc_PCK, ' ', acc_PCKh, ' ', cnt, ' ', pred, ' ', visible)
+
             AP[0]   = (AP[0]  *i + acc[0])      / (i + 1)
             PCK[0]  = (PCK[0] *i + acc_PCK[0])  / (i + 1)
             PCKh[0] = (PCKh[0]*i + acc_PCKh[0]) / (i + 1)
