@@ -95,7 +95,7 @@ class MPII(data.Dataset):
         height, width, _ = img.shape
 
         heatmap = np.zeros(
-            (int(height/self.stride), int(width/self.stride), int(len(kpt)+1)),
+            (int(height/self.stride), int(width/self.stride), int(len(kpt))),
             dtype=np.float32)
         for i in range(len(kpt)):
             # resize from 368 to 46
@@ -129,7 +129,10 @@ class MPII(data.Dataset):
         img = transforms.normalize(transforms.to_tensor(img),
                                    [128.0, 128.0, 128.0],
                                    [256.0, 256.0, 256.0])
+
+        # heatmap.shape -> 46, 46, 17
         heatmap   = transforms.to_tensor(heatmap)
+        # heatmap.shape -> 8, 17, 46, 46
         centermap = transforms.to_tensor(centermap)
 
         return img, heatmap, centermap, img_path

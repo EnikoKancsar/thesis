@@ -176,7 +176,7 @@ class Trainer(object):
             PCK[0]  = (PCK[0] *i + acc_PCK[0])  / (i + 1)
             PCKh[0] = (PCKh[0]*i + acc_PCKh[0]) / (i + 1)
 
-            for j in range(1,self.numClasses+1):
+            for j in range(1, self.numClasses+1):
                 if visible[j] == 1:
                     AP[j]   = (AP[j]  *count[j] + acc[j])      / (count[j] + 1)
                     PCK[j]  = (PCK[j] *count[j] + acc_PCK[j])  / (count[j] + 1)

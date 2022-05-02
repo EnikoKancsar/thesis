@@ -43,6 +43,7 @@ class Decoder(nn.Module):
                         align_corners=True)
 
         x = cat((x, low_level_feat), dim=1)
+        # Concatenates the given sequence of seq tensors in the given dimension
         x = self.last_conv(x)
 
         # x = self.maxpool(x)
