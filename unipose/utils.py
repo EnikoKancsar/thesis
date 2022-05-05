@@ -8,6 +8,43 @@ import numpy as np
 from torch import LongTensor
 from torch import nn
 from torch import prod
+from torch.utils.data import DataLoader
+
+from thesis.unipose.data.mpii import MPII
+
+
+def getDataloader(dataset, sigma, stride, workers, batch_size):
+    """ torch.utils.data.Dataloader
+
+    :param dataset:
+    :param batch_size (int, optional, default=1)
+        how many samples per batch to load
+    :param shuffle: (bool, optional, default=False)
+        True: have the data reshuffled at every epoch
+    :param num_workers: (int, optional, default=0)
+        how many subprocesses to use for data loading.
+        0: the data will be loaded in the main process
+    :param pin_memory: (bool, optional, default=False)
+        True: the data loader will copy Tensors into CUDA pinned memory
+              before returning them
+    """
+
+    if dataset == 'MPII':
+        train_loader = DataLoader(
+            MPII(sigma, is_train=True, stride=stride),
+            batch_size=batch_size, shuffle=True, num_workers=workers,
+            pin_memory=True)
+
+        val_loader = DataLoader(
+            MPII(sigma, is_train=False, stride=stride),
+            batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
+
+        test_loader = DataLoader(
+            MPII(sigma, is_train=False, stride=stride),
+            batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
+    else:
+        raise NotImplementedError
+    return train_loader, val_loader, test_loader
 
 
 def adjust_learning_rate(optimizer, iters, base_lr, gamma, step_size,
