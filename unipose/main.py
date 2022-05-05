@@ -327,9 +327,9 @@ if __name__ == "__main__":
 
             losses['train'].append(train_loss)
             losses['validation'].append(val_loss)
-            for key in AP.keys():
-                APs[key].append(AP[key])
-                PCKs[key].append(PCK[key])
-                PCKhs[key].append(PCKh[key])
+            for index, value in enumerate(AP):
+                APs[index].append(AP[index])
+                PCKs[index].append(PCK[index])
+                PCKhs[index].append(PCKh[index])
 
         plotting(args.dataset, epochs, APs, PCKs, PCKhs, losses)
