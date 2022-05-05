@@ -232,32 +232,21 @@ def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
 
 
 def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
-    print("\nmAP:   %.2f%%" % (mAP*100))
-    print("mPCK:  %.2f%%" % (mPCK*100))
-    print("mPCKh: %.2f%%" % (mPCKh*100))
+    print("mAP    mPCK   mPCKh")
+    print("%.2f%%, %.2f%%, %.2f%%" % (mAP*100, mPCK*100, mPCKh*100))
+    output_text += "\nmAP    mPCK   mPCKh"
+    output_text += "\n%.2f%%, %.2f%%, %.2f%%" % (mAP*100, mPCK*100, mPCKh*100)
 
     if dataset == "MPII":
         print("AP     PCK    PCKh")
+        output_text += "\nAP     PCK    PCKh"
         for index, v in enumerate(AP):
             print("%2.2f%%, %2.2f%%, %2.2f%%" % (AP[index]*100, PCK[index]*100, PCKh[index]*100))
-
-        with open('./output.txt', 'a') as output_file:
-            output_file.write("\nmAP:   %.2f%%" % (mAP*100))
-            output_file.write("\nAPs:   %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
-            % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100,AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100,PCKh[10]*100,\
-                AP[11]*100,AP[12]*100,AP[13]*100,AP[14]*100,AP[15]*100,AP[16]*100))
-
-            output_file.write("\nmPCK:  %.2f%%" % (mPCK*100))
-            output_file.write("\nPCKs:  %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
-            % (PCK[0]*100,PCK[1]*100,PCK[2]*100,PCK[3]*100,PCK[4]*100,PCK[5]*100,PCK[6]*100,PCK[7]*100,PCK[8]*100,PCK[9]*100,PCK[10]*100,\
-                PCK[11]*100,PCK[12]*100,PCK[13]*100,PCK[14]*100,PCK[15]*100,PCK[16]*100))
-
-            output_file.write("\nmPCKh: %.2f%%" % (mPCKh*100))
-            output_file.write("\nPCKhs: %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
-            % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100,PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100,\
-                PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100,PCKh[15]*100,PCKh[16]*100))
+            output_text += "\n%2.2f%%, %2.2f%%, %2.2f%%" % (AP[index]*100, PCK[index]*100, PCKh[index]*100)
     else:
         raise NotImplementedError
+    with open('./output.txt', 'a') as output_file:
+        output_file.write(output_text)
 
 
 def plotting(dataset, epochs, APs, PCKs, PCKhs, losses):
