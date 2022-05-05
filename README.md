@@ -190,6 +190,24 @@ If the conda environment is not set already, the activate command should work co
 The tqdm package is only installable via pip (when I tried).
 Using it with conda, and creating a completely independent, new conda environment can be doomed to fail, the only possible resolution being deleting conda completely and reinstalling it.
 
+## configparser list value
+
+[Grr's answer](https://stackoverflow.com/a/53274707/13497164)
+`example.ini`:
+```
+[Germ]
+germs: a,list,of,names, and,1,2, 3,numbers
+```
+Python:
+```
+cp = ConfigParser(converters={'list': lambda list_value: [item.strip() for item in list_value.split(',')]})
+cp.read('example.ini')
+cp.getlist('Germ', 'germs')
+['a', 'list', 'of', 'names', 'and', '1', '2', '3', 'numbers']
+cp['Germ'].getlist('germs')
+['a', 'list', 'of', 'names', 'and', '1', '2', '3', 'numbers']
+```
+
 # Notes
 
 ## Removing `dataset`
