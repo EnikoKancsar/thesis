@@ -237,7 +237,7 @@ def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
     print("mPCKh: %.2f%%" % (mPCKh*100))
 
     if dataset == "MPII":
-        print("AP    PCK    PCKh")
+        print("AP     PCK    PCKh")
         for index, v in enumerate(AP):
             print("%2.2f%%, %2.2f%%, %2.2f%%" % (AP[index]*100, PCK[index]*100, PCKh[index]*100))
 
