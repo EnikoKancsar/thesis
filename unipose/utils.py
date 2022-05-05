@@ -234,7 +234,7 @@ def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
 def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
     print("mAP    mPCK   mPCKh")
     print("%.2f%%, %.2f%%, %.2f%%" % (mAP*100, mPCK*100, mPCKh*100))
-    output_text += "\nmAP    mPCK   mPCKh"
+    output_text = "\nmAP    mPCK   mPCKh"
     output_text += "\n%.2f%%, %.2f%%, %.2f%%" % (mAP*100, mPCK*100, mPCKh*100)
 
     if dataset == "MPII":
