@@ -1,4 +1,4 @@
-# python 3.9
+# python 3.9git
 
 # torch==1.10.2+cu113
 # torchaudio==0.10.2+cu113
@@ -10,3 +10,4 @@ opencv-python==4.5.5.62  # for image (and video) analyis
 tqdm  # 4.63.0  # used for creating Progress Meters/Bars
 numpy  # 1.22.3
 scipy  # 1.8.0
+bokeh  # 2.4.2

@@ -1,14 +1,13 @@
 from collections import namedtuple
 import os
 
+from bokeh.layouts import row
+from bokeh.plotting import ColumnDataSource, figure, output_file, save
 import cv2  # image analysis
 import numpy as np
 from torch import LongTensor
 from torch import nn
 from torch import prod
-from torch.utils.data import DataLoader
-
-from thesis.unipose.data.mpii import MPII
 
 
 def adjust_learning_rate(optimizer, iters, base_lr, gamma, step_size,
@@ -134,39 +133,6 @@ def get_model_summary(model, *input_tensors, item_length=26, verbose=False):
     return details
 
 
-def getDataloader(dataset, sigma, stride, workers, batch_size):
-    """ torch.utils.data.Dataloader
-
-    :param dataset: 
-    :param batch_size (int, optional, default=1)
-        how many samples per batch to load
-    :param shuffle: (bool, optional, default=False)
-        True: have the data reshuffled at every epoch
-    :param num_workers: (int, optional, default=0)
-        how many subprocesses to use for data loading.
-        0: the data will be loaded in the main process
-    :param pin_memory: (bool, optional, default=False)
-        True: the data loader will copy Tensors into CUDA pinned memory
-              before returning them
-    """
-
-    if dataset == 'MPII':
-        train_loader = DataLoader(
-            MPII(sigma, is_train=True, stride=stride),
-            batch_size=batch_size, shuffle=True, num_workers=workers,
-            pin_memory=True)
-
-        val_loader = DataLoader(
-            MPII(sigma, is_train=False, stride=stride),
-            batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
-
-        test_loader = DataLoader(
-            MPII(sigma, is_train=False, stride=stride),
-            batch_size=1, shuffle=True, num_workers=1, pin_memory=True)
-
-    return train_loader, val_loader, test_loader
-
-
 def get_kpts(maps, img_h = 368.0, img_w = 368.0):
 
     # maps (1,15,46,46)
@@ -182,7 +148,6 @@ def get_kpts(maps, img_h = 368.0, img_w = 368.0):
     return kpts
 
 
-
 def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
 
            #       RED           GREEN           RED          YELLOW          YELLOW          PINK          GREEN
@@ -190,21 +155,11 @@ def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
               [255,000,000], [255,255,000], [255,000,255], [000,255,000], [000,255,000], [000,000,255], [255,255,000], [255,000,000]]
            #       BLUE          YELLOW          PINK          GREEN          GREEN           RED          YELLOW           BLUE
 
-    if dataset == "LSP":
-        limbSeq = [[13, 12], [12, 9], [12, 8], [9, 10], [8, 7], [10,11], [7, 6], [12, 3],\
-                    [12, 2], [ 2, 1], [ 1, 0], [ 3, 4], [4,  5], [15,16], [16,18], [17,18], [15,17]]
-        kpts[15][0] = kpts[15][0]  - 25
-        kpts[15][1] = kpts[15][1]  - 50
-        kpts[16][0] = kpts[16][0]  - 25
-        kpts[16][1] = kpts[16][1]  + 50
-        kpts[17][0] = kpts[17][0] + 25
-        kpts[17][1] = kpts[17][1] - 50
-        kpts[18][0] = kpts[18][0] + 25
-        kpts[18][1] = kpts[18][1] + 50
-
-    elif dataset == "MPII":
+    if dataset == "MPII":
                 #    HEAD    R.SLDR  R.BICEP  R.FRARM   L.SLDR  L.BICEP  L.FRARM   TORSO    L.HIP   L.THIGH   L.CALF   R.HIP   R.THIGH   R.CALF  EXT.HEAD
         limbSeq = [[ 8, 9], [ 7,12], [12,11], [11,10], [ 7,13], [13,14], [14,15], [ 7, 6], [ 6, 2], [ 2, 1], [ 1, 0], [ 6, 3], [ 3, 4], [ 4, 5], [ 7, 8]]
+    else:
+        raise NotImplementedError
 
     # im = cv2.resize(cv2.imread(img_path),(368,368))
     # draw points
@@ -240,21 +195,14 @@ def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
 
 
 def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
+    print("\nmAP:   %.2f%%" % (mAP*100))
+    print("mPCK:  %.2f%%" % (mPCK*100))
+    print("mPCKh: %.2f%%" % (mPCKh*100))
+
     if dataset == "MPII":
-        print("\nmAP:   %.2f%%" % (mAP*100))
-        print("APs:   %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
-            % (AP[0]*100,AP[1]*100,AP[2]*100,AP[3]*100,AP[4]*100,AP[5]*100,AP[6]*100,AP[7]*100,AP[8]*100,AP[9]*100,PCKh[10]*100,\
-                AP[11]*100,AP[12]*100,AP[13]*100,AP[14]*100,AP[15]*100,AP[16]*100))
-
-        print("mPCK:  %.2f%%" % (mPCK*100))
-        print("PCKs:  %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
-            % (PCK[0]*100,PCK[1]*100,PCK[2]*100,PCK[3]*100,PCK[4]*100,PCK[5]*100,PCK[6]*100,PCK[7]*100,PCK[8]*100,PCK[9]*100,PCK[10]*100,\
-                PCK[11]*100,PCK[12]*100,PCK[13]*100,PCK[14]*100,PCK[15]*100,PCK[16]*100))
-
-        print("mPCKh: %.2f%%" % (mPCKh*100))
-        print("PCKhs: %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
-            % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100,PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100,\
-                PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100,PCKh[15]*100,PCKh[16]*100))
+        print("AP    PCK    PCKh")
+        for index in AP:
+            print("%2.2f%%, %2.2f%%, %2.2f%%" % AP[index]*100, PCK[index]*100, PCKh[index]*100)
 
         with open('./output.txt', 'a') as output_file:
             output_file.write("\nmAP:   %.2f%%" % (mAP*100))
@@ -271,3 +219,59 @@ def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
             output_file.write("\nPCKhs: %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%, %2.2f%%"\
             % (PCKh[0]*100,PCKh[1]*100,PCKh[2]*100,PCKh[3]*100,PCKh[4]*100,PCKh[5]*100,PCKh[6]*100,PCKh[7]*100,PCKh[8]*100,PCKh[9]*100,\
                 PCKh[10]*100,PCKh[11]*100,PCKh[12]*100,PCKh[13]*100,PCKh[14]*100,PCKh[15]*100,PCKh[16]*100))
+    else:
+        raise NotImplementedError
+
+
+def plotting(dataset, epochs, APs, PCKs, PCKhs, losses):
+    x_axis = range(epochs)
+    AP_source = ColumnDataSource(APs)
+    PCK_source = ColumnDataSource(PCKs)
+    PCKh_source = ColumnDataSource(PCKhs)
+    loss_source = ColumnDataSource(losses)
+
+    output_file('plots.html')
+    AP_plot   = figure(title='AP',   x_axis_label='epochs', y_axis_label='AP')
+    PCK_plot  = figure(title='PCK',  x_axis_label='epochs', y_axis_label='PCK')
+    PCKh_plot = figure(title='PCKh', x_axis_label='epochs', y_axis_label='PCKh')
+    loss_plot = figure(title='loss', x_axis_label='epochs', y_axis_label='loss')
+
+    colors = [
+        'darkblue',  'darkorchid',  'darkgoldenrod', 'darkgreen',
+        'darkkhaki', 'darkmagenta', 'darkorange',    'darkslategrey',
+        'darkred',   'darksalmon',  'darkseagreen',  'darkslateblue',
+        'darkcyan',  'darkviolet',  'darkturquoise', 'darkolivegreen',
+        'darkgrey',  'deeppink',    'deepskyblue',   'dodgerblue'
+    ]  # len(colors) == 20, plenty for other datasets too
+    joints = []
+    if dataset == 'MPII':
+        joints = {
+            0: 'average',
+            1: 'right ankle',    2: 'right knee',   3: 'right hip',
+            4: 'left hip',       5: 'left knee',    6: 'left ankle',
+            7: 'pelvis',         8: 'thorax',       9: 'upper neck', 10: 'head top',
+            11: 'right wrist',   12: 'right elbow', 13: 'right shoulder',
+            14: 'left shoulder', 15: 'left elbow',  16: 'left wrist'
+        }
+    else:
+        raise NotImplementedError
+
+    for index, value in joints.items():
+        AP_plot.line(
+            x_axis, AP_source.data[index],
+            line_color=colors[index], legend_label=value, line_width=2)
+        PCK_plot.line(
+            x_axis, PCK_source.data[index],
+            line_color=colors[index], legend_label=value, line_width=2)
+        PCKh_plot.line(
+            x_axis, PCKh_source.data[index],
+            line_color=colors[index], legend_label=value, line_width=2)
+
+    loss_plot.line(
+        x_axis, loss_source.data['train'],
+        line_color=colors[0], legend_label='train', line_width=2)
+    loss_plot.line(
+        x_axis, loss_source.data['validation'],
+        line_color=colors[1], legend_label='validation', line_width=2)
+
+    save(row(loss_plot, AP_plot, PCK_plot, PCKh_plot))

@@ -13,13 +13,14 @@ import torch.optim
 from tqdm import tqdm  # Progress Bar Creator
 
 sys.path.append("..")
+from thesis.unipose.data import getDataloader
 from thesis.unipose.evaluate import accuracy
 from thesis.unipose.model.unipose import Unipose
 from thesis.unipose.utils import adjust_learning_rate
 from thesis.unipose.utils import draw_paint
 from thesis.unipose.utils import get_model_summary
-from thesis.unipose.utils import getDataloader
 from thesis.unipose.utils import get_kpts
+from thesis.unipose.utils import plotting
 from thesis.unipose.utils import printAccuracies
 
 
@@ -49,8 +50,15 @@ class Trainer(object):
 
         cudnn.benchmark   = True  # good when input sizes do not vary
 
-        if self.dataset == "MPII":
-            self.numClasses = CONF.getint("MPII", "NUMBER_OF_CLASSES")
+        try:
+            self.numClasses = CONF.getint(self.dataset, "NUMBER_OF_CLASSES")
+        except configparser.NoSectionError:
+            print("Section not found: ", self.dataset)
+            if self.dataset in ['MPII']:
+                print("Edit your conf.ini file.")
+            else:
+                print("Invalid dataset choice.")
+            sys.exit()
 
         self.train_loader, self.val_loader, self.test_loader = getDataloader(
             self.dataset, self.sigma, self.stride, self.workers,
@@ -102,19 +110,20 @@ class Trainer(object):
         print("Epoch " + str(epoch) + ':')
         tbar = tqdm(self.train_loader)
 
-        for i, (input, heatmap, centermap, img_path) in enumerate(tbar):
+        # unipose.data.mpii.MPII.__getitem__ returns these
+        for iteration_count, (input, heatmap) in enumerate(tbar):
             learning_rate = adjust_learning_rate(
                 self.optimizer, self.iters, self.learning_rate, policy='step',
                 gamma=self.gamma, step_size=self.step_size)
 
-            input_var = input.cuda()
-            heatmap_var = heatmap.cuda()
+            input_on_cuda = input.cuda()
+            heatmap_on_cuda = heatmap.cuda()
 
             self.optimizer.zero_grad()
 
-            heat = self.model(input_var)
+            heat = self.model(input_on_cuda)
 
-            loss_heat = self.criterion(heat, heatmap_var)
+            loss_heat = self.criterion(heat, heatmap_on_cuda)
 
             loss = loss_heat
 
@@ -124,11 +133,11 @@ class Trainer(object):
             self.optimizer.step()
 
             tbar.set_description(
-                'Train loss: %.6f' % (train_loss / ((i + 1)*self.batch_size)))
+                'Train loss: %.6f' % (train_loss / ((iteration_count + 1)*self.batch_size)))
 
             self.iters += 1
 
-            if i == 10000:
+            if iteration_count == 10000:
                 break
 
         with open('./output.txt', 'a') as output_file:
@@ -137,44 +146,44 @@ class Trainer(object):
             output_file.write('\n' + str(train_loss / (10001*self.batch_size)))
         
         torch.save(self.model.state_dict(), './model_state_dict.pt')
+        return train_loss
 
     def validation(self, epoch):
         self.model.eval()
         tbar = tqdm(self.val_loader, desc='\r')
         val_loss = 0.0
 
-        AP    = np.zeros(self.numClasses+1)
-        PCK   = np.zeros(self.numClasses+1)
-        PCKh  = np.zeros(self.numClasses+1)
-        count = np.zeros(self.numClasses+1)
+        AP    = np.zeros(self.numClasses + 1)
+        PCK   = np.zeros(self.numClasses + 1)
+        PCKh  = np.zeros(self.numClasses + 1)
+        count = np.zeros(self.numClasses + 1)
 
         cnt = 0
-        for i, (input, heatmap, centermap, img_path) in enumerate(tbar):
-
+        for iteration_count, (input, heatmap) in enumerate(tbar):
             cnt += 1
 
-            input_var = input.cuda()
-            heatmap_var = heatmap.cuda()
+            input_on_cuda = input.cuda()
+            heatmap_on_cuda = heatmap.cuda()
             self.optimizer.zero_grad()
 
-            heat = self.model(input_var)
-            loss_heat = self.criterion(heat,  heatmap_var)
+            heat = self.model(input_on_cuda)
+            loss_heat = self.criterion(heat, heatmap_on_cuda)
 
             loss = loss_heat
 
             val_loss += loss_heat.item()
 
             tbar.set_description(
-                'Val loss: %.6f' % (val_loss / ((i + 1)*self.batch_size)))
+                'Val loss: %.6f' % (val_loss / ((iteration_count + 1)*self.batch_size)))
 
             acc, acc_PCK, acc_PCKh, cnt, pred, visible = accuracy(
                 output=heat.detach().cpu().numpy(),
-                target=heatmap_var.detach().cpu().numpy(),
+                target=heatmap_on_cuda.detach().cpu().numpy(),
                 threshold_PCK=0.2, threshold_PCKh=0.5, dataset=self.dataset)
 
-            AP[0]   = (AP[0]  *i + acc[0])      / (i + 1)
-            PCK[0]  = (PCK[0] *i + acc_PCK[0])  / (i + 1)
-            PCKh[0] = (PCKh[0]*i + acc_PCKh[0]) / (i + 1)
+            AP[0]   = (AP[0]  *iteration_count + acc[0])      / (iteration_count + 1)
+            PCK[0]  = (PCK[0] *iteration_count + acc_PCK[0])  / (iteration_count + 1)
+            PCKh[0] = (PCKh[0]*iteration_count + acc_PCKh[0]) / (iteration_count + 1)
 
             for j in range(1, self.numClasses+1):
                 if visible[j] == 1:
@@ -217,6 +226,8 @@ class Trainer(object):
             output_file.write('\nVal loss:')
             output_file.write('\n' + str(val_loss))
             output_file.write('\n' + str(val_loss / (10001*self.batch_size)))
+
+        return val_loss, AP, PCK, PCKh
 
     def test(self, epoch):
         self.model.eval()
@@ -272,7 +283,8 @@ class Trainer(object):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--pretrained', default=False, type=bool, help="""
+    parser.add_argument('--pretrained', default=False, choices=[False, True],
+                        type=bool, help="""
     If True, the pretrained weights will be loaded with torch.load()
     from the conf.ini file PRETRAINED section PATH_TO_WEIGHTS value.
     Specify the value to correctly use the argument.
@@ -293,6 +305,31 @@ if __name__ == "__main__":
         trainer.test(0)
     else:
         epochs = CONF.getint('HYPERPARAMETERS', 'EPOCHS')
+        numClasses = None
+        try:
+            numClasses = CONF.getint(args.dataset, 'NUMBER_OF_CLASSES')
+        except configparser.NoSectionError:
+            print("Section not found: ", args.dataset)
+            if args.dataset in ['MPII']:
+                print("Edit your conf.ini file.")
+            else:
+                print("Invalid dataset choice.")
+            sys.exit()
+
+        APs, PCKs, PCKhs = {}, {}, {}
+        for index in range(numClasses + 1):
+            APs[index], PCKs[index], PCKhs[index] = [], [], []
+        losses = {'train': [], 'validation': []}
+
         for epoch in range(epochs):
-            trainer.training(epoch)
-            trainer.validation(epoch)
+            train_loss = trainer.training(epoch)
+            val_loss, AP, PCK, PCKh = trainer.validation(epoch)
+
+            losses['train'].append(train_loss)
+            losses['validation'].append(val_loss)
+            for key in AP.keys():
+                APs[key].append(AP[key])
+                PCKs[key].append(PCK[key])
+                PCKhs[key].append(PCKh[key])
+
+        plotting(args.dataset, epochs, APs, PCKs, PCKhs, losses)

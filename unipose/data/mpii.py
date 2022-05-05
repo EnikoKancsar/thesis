@@ -8,42 +8,22 @@ import numpy as np
 import torch
 import torch.utils.data as data
 
-from thesis.unipose import transforms
+from thesis.unipose.data import gaussian_kernel
+from thesis.unipose.data import normalize
+from thesis.unipose.data import to_tensor
 
 
 CONF = configparser.ConfigParser()
 CONF.read('./conf.ini')
 
 
-def gaussian_kernel(size_w, size_h, center_x, center_y, sigma):
-    """Gaussian Kernel (or Radial Basic Function (RBF) kernel)
-    It is most widely used.
-    Each kernel entry is a dissimilarity measure through using the square of
-    Euclidean distance between two data points in a negative exponential.
-    The sigma parameter contained in the entry is the Parzen window width for
-    RBF kernel.
-
-    source: Han 2011, Sigma Tuning of Gaussian Kernels
-    https://www.cs.rpi.edu/~szymansk/papers/han.10.pdf
-
-    """
-    gridy, gridx = np.mgrid[0:size_h, 0:size_w]
-    D2 = (gridx - center_x) ** 2 + (gridy - center_y) ** 2
-    return np.exp(-D2 / 2.0 / sigma / sigma)
-
-
 class MPII(data.Dataset):
     def __init__(self, sigma, is_train, stride=8):
-        self.width       = 368
-        self.height      = 368
-        self.is_train    = is_train
-        self.sigma       = sigma
-        self.stride      = stride
-
-        self.videosFolders = {}
-        self.labelFiles    = {}
-        self.full_img_List = {}
-        self.numPeople     = []
+        self.width    = 368
+        self.height   = 368
+        self.is_train = is_train
+        self.sigma    = sigma
+        self.stride   = stride
 
         self.images_dir, anno_file = (
             (CONF.get("MPII", "DIR_IMAGES_TRAIN"),
@@ -57,85 +37,57 @@ class MPII(data.Dataset):
             self.annotations = json.load(anno_file)
 
     def __getitem__(self, index):
-        scale_factor = 0.25
         annotation = self.annotations[index]
         
         img_path = os.path.join(self.images_dir, annotation['image_name'])
 
-        joints = annotation['list_of_people'][0]['joints']
-        points = []
-        for joint_id, joint_value in joints.items():
+        joints_of_first_person = annotation['list_of_people'][0]['joints']
+        joints = []
+        for joint_coordinates in joints_of_first_person.values():
             point = [
-                joint_value["x"], joint_value["y"], joint_value["is_visible"]
+                joint_coordinates["x"], joint_coordinates["y"],
+                joint_coordinates["is_visible"]
             ]
             if point[0]==-1.0:
                 point[2] = 0.00
-            points.append(point)
-        points = torch.Tensor(points)
-
-        objpos = annotation['list_of_people'][0]['objpos']
-        center = torch.Tensor([objpos['x'], objpos['y']])
-        
-        scale  = annotation['list_of_people'][0]['scale']
-
-        if center[0] != -1:
-            center[1] = center[1] + 15*scale
-            scale     = scale*1.25
+            joints.append(point)
+        joints = torch.Tensor(joints)
 
         # Single Person
-        nParts = points.size(0)
-        img    = cv2.imread(img_path)
+        img = cv2.imread(img_path)
 
-        kpt = points
-
-        if img.shape[0] != 368 or img.shape[1] != 368:
-            kpt[:,0] = kpt[:,0] * (368/img.shape[1])
-            kpt[:,1] = kpt[:,1] * (368/img.shape[0])
-            img = cv2.resize(img, (368,368))
+        # img.shape = height, width, channels AND NOT width, height order
+        if img.shape[0] != self.height or img.shape[1] != self.width:
+            joints[:,0] = joints[:,0] * (self.width/img.shape[1])
+            joints[:,1] = joints[:,1] * (self.height/img.shape[0])
+            img = cv2.resize(img, (self.width, self.height))
         height, width, _ = img.shape
 
         heatmap = np.zeros(
-            (int(height/self.stride), int(width/self.stride), int(len(kpt))),
+            (int(height/self.stride), int(width/self.stride), int(len(joints)+1)),
             dtype=np.float32)
-        for i in range(len(kpt)):
+        for joint in range(len(joints)):
             # resize from 368 to 46
-            x = int(kpt[i][0]) * 1.0 / self.stride
-            y = int(kpt[i][1]) * 1.0 / self.stride
-            heat_map = gaussian_kernel(
-                size_h=int(height/self.stride), 
-                size_w=int(width/self.stride),
-                center_x=x, center_y=y, sigma=self.sigma)
-            heat_map[heat_map > 1] = 1
-            heat_map[heat_map < 0.0099] = 0
-            heatmap[:, :, i + 1] = heat_map
+            x = int(joints[joint][0]) * 1.0 / self.stride
+            y = int(joints[joint][1]) * 1.0 / self.stride
+            heatmap_of_joint = gaussian_kernel(
+                size_h=int(height/self.stride), size_w=int(width/self.stride),
+                center_x=x, center_y=y,
+                sigma=self.sigma)
+            heatmap_of_joint[heatmap_of_joint > 1] = 1
+            heatmap_of_joint[heatmap_of_joint < 0.0099] = 0
+            heatmap[:, :, joint + 1] = heatmap_of_joint
 
-        # for background
+        # for background - what does it do?
         heatmap[:, :, 0] = 1.0 - np.max(heatmap[:, :, 1:], axis=2)
 
-        centermap = np.zeros(
-            (int(height/self.stride), int(width/self.stride), 1),
-            dtype=np.float32)
-        center_map = gaussian_kernel(
-            size_h=int(height/self.stride),
-            size_w=int(width/self.stride),
-            center_x=int(center[0]/self.stride),
-            center_y=int(center[1]/self.stride),
-            sigma=3)
-        center_map[center_map > 1] = 1
-        center_map[center_map < 0.0099] = 0
-        centermap[:, :, 0] = center_map
-
-        orig_img = cv2.imread(img_path)
-        img = transforms.normalize(transforms.to_tensor(img),
-                                   [128.0, 128.0, 128.0],
-                                   [256.0, 256.0, 256.0])
-
+        # i don't understand what normalize does exactly or why it is important
+        normalized_img = normalize(
+            to_tensor(img), [128.0, 128.0, 128.0], [256.0, 256.0, 256.0])
         # heatmap.shape -> 46, 46, 17
-        heatmap   = transforms.to_tensor(heatmap)
-        # heatmap.shape -> 8, 17, 46, 46
-        centermap = transforms.to_tensor(centermap)
+        heatmap = to_tensor(heatmap)
 
-        return img, heatmap, centermap, img_path
+        return normalized_img, heatmap
 
     def __len__(self):
         return len(self.annotations)
