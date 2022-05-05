@@ -284,13 +284,13 @@ def plotting(dataset, epochs, APs, PCKs, PCKhs, losses):
 
     for index, value in joints.items():
         AP_plot.line(
-            x_axis, AP_source.data[index],
+            x_axis, AP_source.data[str(index)],
             line_color=colors[index], legend_label=value, line_width=2)
         PCK_plot.line(
-            x_axis, PCK_source.data[index],
+            x_axis, PCK_source.data[str(index)],
             line_color=colors[index], legend_label=value, line_width=2)
         PCKh_plot.line(
-            x_axis, PCKh_source.data[index],
+            x_axis, PCKh_source.data[str(index)],
             line_color=colors[index], legend_label=value, line_width=2)
 
     loss_plot.line(
