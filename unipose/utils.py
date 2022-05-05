@@ -263,11 +263,11 @@ def plotting(dataset, epochs, APs, PCKs, PCKhs, losses):
     loss_plot = figure(title='loss', x_axis_label='epochs', y_axis_label='loss')
 
     colors = [
-        'darkblue',  'darkorchid',  'darkgoldenrod', 'darkgreen',
-        'darkkhaki', 'darkmagenta', 'darkorange',    'darkslategrey',
-        'darkred',   'darksalmon',  'darkseagreen',  'darkslateblue',
-        'darkcyan',  'darkviolet',  'darkturquoise', 'darkolivegreen',
-        'darkgrey',  'deeppink',    'deepskyblue',   'dodgerblue'
+        'darkblue',  'darkkhaki',  'darkgoldenrod', 'darkgreen',
+        'deeppink', 'darkmagenta', 'darkorange',    'darkslategrey',
+        'darkred',   'darksalmon', 'darkseagreen',  'darkslateblue',
+        'darkcyan',  'darkviolet', 'darkturquoise', 'darkolivegreen',
+        'darkgrey',  'darkorchid', 'deepskyblue',   'dodgerblue'
     ]  # len(colors) == 20, plenty for other datasets too
     joints = []
     if dataset == 'MPII':
