@@ -318,7 +318,7 @@ if __name__ == "__main__":
 
         APs, PCKs, PCKhs = {}, {}, {}
         for index in range(numClasses + 1):
-            APs[index], PCKs[index], PCKhs[index] = [], [], []
+            APs[str(index)], PCKs[str(index)], PCKhs[str(index)] = [], [], []
         losses = {'train': [], 'validation': []}
 
         for epoch in range(epochs):
