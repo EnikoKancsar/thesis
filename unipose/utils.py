@@ -238,7 +238,7 @@ def printAccuracies(mAP, AP, mPCKh, PCKh, mPCK, PCK, dataset):
 
     if dataset == "MPII":
         print("AP    PCK    PCKh")
-        for index in AP:
+        for index, v in enumerate(AP):
             print("%2.2f%%, %2.2f%%, %2.2f%%" % AP[index]*100, PCK[index]*100, PCKh[index]*100)
 
         with open('./output.txt', 'a') as output_file:
