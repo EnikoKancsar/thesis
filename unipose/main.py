@@ -13,11 +13,11 @@ import torch.optim
 from tqdm import tqdm  # Progress Bar Creator
 
 sys.path.append("..")
-from thesis.unipose.data import getDataloader
 from thesis.unipose.evaluate import accuracy
 from thesis.unipose.model.unipose import Unipose
 from thesis.unipose.utils import adjust_learning_rate
 from thesis.unipose.utils import draw_paint
+from thesis.unipose.utils import getDataloader
 from thesis.unipose.utils import get_model_summary
 from thesis.unipose.utils import get_kpts
 from thesis.unipose.utils import plotting
